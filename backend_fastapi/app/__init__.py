@@ -1,0 +1,1 @@
+"""PlanWise FastAPI backend package."""

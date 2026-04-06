@@ -13,14 +13,16 @@ services:
             - backend
 
     backend:
-        build: ./docker/backend
+        build:
+            context: .
+            dockerfile: ./docker/fastapi_backend/Dockerfile
+        environment:
+            - PLANWISE_DATABASE_URL=mysql+pymysql://innolab:innolab@mariadb_database:3306/project_calculation
+            - PLANWISE_API_BASE_URL=http://127.0.0.1:8080
+            - PLANWISE_STORAGE_PUBLIC_PATH=/app_storage/public
         volumes:
-            - ./backend:/backend
-            - /backend/vendor
-            - /backend/bootstrap/cache
-            - /backend/storage/framework/cache
-            - /backend/storage/framework/sessions
-            - /backend/storage/framework/views
+            - ./backend_fastapi:/backend_fastapi
+            - ./storage/app/public:/app_storage/public
         ports:
             - "127.0.0.1:8080:80"
         depends_on:

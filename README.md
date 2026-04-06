@@ -1,52 +1,45 @@
-# ProjektkalkulationTool
+# PlanWise
 
-## Deployment
+PlanWise is a project calculation tool with an Angular frontend, a FastAPI backend, and MariaDB.
 
-### General Prerequisites
+## Local Development
+
+Prerequisites:
 - Git
+- Docker Desktop or Docker Engine
 
-## Frontend
-### Prerequisites
-- Node.js (LTS)
+Start the full stack:
+
+```bash
+docker compose up --build
+```
+
+Services:
+- Frontend: http://127.0.0.1:4200
+- Backend API: http://127.0.0.1:8080
+- MariaDB: 127.0.0.1:3306
+
+On backend startup, FastAPI waits for MariaDB, recreates the schema, seeds the mock data, and then starts Uvicorn.
+
+## Login Data
+
+Admin:
+
+```text
+admin@technikum-wien.at
+123456
+```
+
+Faculty users:
+
+```text
+informatik@technikum-wien.at
+industrial-engineering@technikum-wien.at
+life-science@technikum-wien.at
+electronic-engineering@technikum-wien.at
+123456
+```
 
 ## Backend
-### Prerequisites
-- PHP 8.2
-- MariaDB or MySQL Database
-- Composer
 
-## Local Development Setup
-### Frontend
-#### Prerequisites
--   Node.js
-    - https://nodejs.org/en/download 
-- Angular CLI
-    - https://angular.io/guide/setup-local#install-the-angular-cli
-#### Setup
-```
-cd frontend
-npm install
-```
-If there are errors/vulnerabilities (critical or high), try the following:
-```
-npm update
-npm audit fix
-```
-Start application:
-```
-ng serve
-```
-
-### Backend
-#### Prerequisites
-- Docker Engine (e.g. Docker Desktop for Windows)
-#### Setup
-(In *ProjektkalkulationTool* folder)
-```
-docker compose up
-docker compose exec backend bash
-php artisan key:generate
-php artisan jwt:secret
- 
-php artisan storage:link
-```
+The backend is implemented with FastAPI. The previous backend implementation has been removed.
