@@ -1,0 +1,34 @@
+.notification-form-row {
+  align-items: flex-start;
+  display: flex;
+  gap: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.notification-form-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.notification-form-field input {
+  width: 300px;
+}
+
+.notification-save-button {
+  margin-left: 0.5rem;
+}
+
+@media (max-width: 720px) {
+  .notification-form-row {
+    flex-wrap: wrap;
+  }
+
+  .notification-form-field,
+  .notification-form-field input {
+    width: 100%;
+  }
+
+  .notification-save-button {
+    margin-left: 0;
+  }
+}

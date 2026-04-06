@@ -1,9 +1,9 @@
-<div class="flex align-items-start gap-4" [formGroup]="formGroup">
+<div class="notification-form-row form-control-group" [formGroup]="formGroup" [class.validation-submitted]="submitted">
   <p-inputSwitch [styleClass]="'mt-1'" formControlName="activated"/>
-  <div class="flex flex-column">
-    <input type="text" pInputText formControlName="email" placeholder="E-Mail-Adresse" style="width: 300px"/>
-    <small *ngIf="email.errors" class="p-error">Ungültige E-Mail-Adresse.</small>
+  <div class="notification-form-field">
+    <input type="text" pInputText formControlName="email" placeholder="E-Mail-Adresse"/>
+    <small *ngIf="email.errors && submitted" class="p-error">Ungültige E-Mail-Adresse.</small>
   </div>
-  <p-button label="Änderungen speichern" [disabled]="!formChanges() || formGroup.invalid" [loading]="loading"
+  <p-button styleClass="notification-save-button" label="Änderungen speichern" [disabled]="!formChanges()" [loading]="loading"
             (click)="update()"/>
 </div>

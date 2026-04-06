@@ -44,8 +44,7 @@ export class UpdateFacultyComponent implements OnInit{
 
     submit() {
       this.submitted = true;
-      if(this.createForm.invalid)
-        return;
+      if (this.createForm.invalid) { this.createForm.markAllAsTouched(); return; }
 
       this.loading = true;
       console.log(this.name.value)

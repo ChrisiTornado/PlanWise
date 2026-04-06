@@ -14,7 +14,7 @@ export class FacultyService extends AResourceService<Faculty> {
   }
 
   override getAll(requestedByCustomer: boolean = false) {
-    this._loading.next(true);
+    if (!this.models?.length) this._loading.next(true);
     this.http.get<Faculty[]>((requestedByCustomer ? environment.apiUrl : environment.adminApiUrl) + 'faculties')
       .pipe(finalize(() => this._loading.next(false)))
       .subscribe({

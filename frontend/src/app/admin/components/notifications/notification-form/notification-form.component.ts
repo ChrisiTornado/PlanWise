@@ -28,6 +28,7 @@ export class NotificationFormComponent implements OnInit {
   @Input() notification: Notification
   formGroup: FormGroup
   loading: boolean
+  submitted: boolean = false
 
   constructor(private formBuilder: FormBuilder,
               private messageService: MessageService,
@@ -45,8 +46,8 @@ export class NotificationFormComponent implements OnInit {
   }
 
   update() {
-    if(this.formGroup.invalid)
-      return;
+    this.submitted = true
+    if (this.formGroup.invalid) { this.formGroup.markAllAsTouched(); return; }
 
     this.loading = true
     this.notificationService.update(

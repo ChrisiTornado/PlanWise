@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {ProjectExpense} from "../../../../../models/project-expense.model";
 import {ProjectLecturer} from "../../../../../models/project-lecturer.model";
 import {OtherExpense} from "../../../../../models/other-expense.model";
@@ -26,72 +26,140 @@ export class CalculationsComponent {
   @Input() participants: number;
   @Input() duration: number;
   @Input() priceForCoursePerDay: number;
+  @Input() showRevenue: boolean = true;
+  @Input() showAdminCosts: boolean = false;
   protected readonly Utils = Utils;
 
-   constructor() {
-    console.log(this.groupSpecificExpenses)
-   }
-
   get variableOtherExpenses(): OtherExpense[] {
-    return this.otherExpenses.filter(oe => oe.perParticipant)
+    return (this.otherExpenses ?? []).filter(oe => oe.perParticipant)
   }
 
   get variableOtherExpensesCosts(): number {
-    let c = 0
-    this.variableOtherExpenses.forEach(oe => {
-      c += oe.costs ?? 0
-    })
-    return c
+    return Utils.getVariableOtherExpenseCosts(this.otherExpenses, this.participants)
+  }
+
+  get variableOtherExpensesCostsPerParticipant(): number {
+    return Utils.getVariableOtherExpenseCostsPerParticipant(this.otherExpenses)
   }
 
   get fixOtherExpenses(): OtherExpense[] {
-    return this.otherExpenses.filter(oe => !oe.perParticipant)
+    return (this.otherExpenses ?? []).filter(oe => !oe.perParticipant)
   }
 
   get fixOtherExpensesCosts(): number {
-    let c = 0
-    this.fixOtherExpenses.forEach(oe => {
-      c += oe.costs ?? 0 
-    })
-    return c
+    return Utils.getFixedOtherExpenseCosts(this.otherExpenses)
   }
 
-  get variableGroupSpecificExpenses(): OtherExpense[] {
-    return this.groupSpecificExpenses.filter(ge => ge.perParticipant)
+  get variableGroupSpecificExpenses(): GroupSpecificExpense[] {
+    return (this.groupSpecificExpenses ?? []).filter(ge => ge.perParticipant)
   }
 
   get variableGroupSpecificExpensesCosts(): number {
-    let c = 0
-    this.variableGroupSpecificExpenses.forEach(ge => {
-      c += ge.costs ?? 0
-    })
-    return c
+    return Utils.getVariableGroupSpecificExpenseCosts(this.groupSpecificExpenses, this.participants)
   }
 
-  get fixGroupSpecificExpenses(): OtherExpense[] {
-    return this.groupSpecificExpenses.filter(ge => !ge.perParticipant)
+  get variableGroupSpecificExpensesCostsPerParticipant(): number {
+    return Utils.getVariableGroupSpecificExpenseCostsPerParticipant(this.groupSpecificExpenses)
+  }
+
+  get fixGroupSpecificExpenses(): GroupSpecificExpense[] {
+    return (this.groupSpecificExpenses ?? []).filter(ge => !ge.perParticipant)
   }
 
   get fixGroupSpecificExpensesCosts(): number {
-    let c = 0
-    this.fixGroupSpecificExpenses.forEach(oe => {
-      c += oe.costs ?? 0
-    })
-    return c
+    return Utils.getFixedGroupSpecificExpenseCosts(this.groupSpecificExpenses)
   }
 
   get revenue(): number {
-    return this.participants * (this.priceForCoursePerDay) * this.duration
+    return Utils.getRevenue(this.participants, this.duration, this.priceForCoursePerDay)
+  }
+
+  get revenuePerParticipant(): number {
+    return (this.duration ?? 0) * (this.priceForCoursePerDay ?? 0)
+  }
+
+  get hasRevenueInputs(): boolean {
+    return (this.participants ?? 0) > 0 && (this.duration ?? 0) > 0 && (this.priceForCoursePerDay ?? 0) > 0
   }
 
   get allFixedCosts(): number {
-    return Utils.getLecturersCosts(this.projectLecturers) + Utils.getExpenseCosts(this.projectExpenses) + this.fixOtherExpensesCosts
+    return Utils.getFixedProjectCosts(this.projectLecturers, this.projectExpenses, this.otherExpenses, this.groupSpecificExpenses)
   }
 
   get totalGroupSpecificCosts(): number {
-  const variableCosts = this.variableGroupSpecificExpensesCosts * this.participants;
-  const fixCosts = this.fixGroupSpecificExpensesCosts;
-  return variableCosts + fixCosts;
+    return Utils.getGroupSpecificExpenseCosts(this.groupSpecificExpenses, this.participants)
+  }
+
+  get projectExpensesCosts(): number {
+    return Utils.getExpenseCosts(this.projectExpenses)
+  }
+
+  get lecturersCosts(): number {
+    return Utils.getLecturersCosts(this.projectLecturers)
+  }
+
+  get fixedOtherCosts(): number {
+    return this.fixOtherExpensesCosts + this.fixGroupSpecificExpensesCosts
+  }
+
+  get fixedProjectCostsWithoutLecturers(): number {
+    return this.projectExpensesCosts + this.fixedOtherCosts
+  }
+
+  get variableCostsPerParticipant(): number {
+    return Utils.getVariableProjectCostsPerParticipant(this.otherExpenses, this.groupSpecificExpenses)
+  }
+
+  get variableCostsTotal(): number {
+    return this.variableCostsPerParticipant * (this.participants ?? 0)
+  }
+
+  get contributionMarginPerParticipant(): number {
+    return this.revenuePerParticipant - this.variableCostsPerParticipant
+  }
+
+  get totalCosts(): number {
+    return Utils.calculateProjectCosts(this.projectLecturers, this.projectExpenses, this.otherExpenses, this.participants, this.groupSpecificExpenses)
+  }
+
+  get profit(): number {
+    return this.revenue - this.totalCosts
+  }
+
+  get breakEvenParticipants(): number | null {
+    return Utils.getBreakEvenParticipants(this.projectLecturers, this.projectExpenses, this.otherExpenses, this.groupSpecificExpenses, this.duration, this.priceForCoursePerDay)
+  }
+
+  get hasProfit(): boolean {
+    return this.profit >= 0
+  }
+
+  get resultStepLabel(): string {
+    if (this.showAdminCosts)
+      return this.showRevenue ? '6.' : '5.'
+
+    return this.showRevenue ? '4.' : '3.'
+  }
+
+  lecturerRate(projectLecturer: ProjectLecturer): number {
+    if (!projectLecturer)
+      return 0
+
+    return projectLecturer.daily
+      ? projectLecturer.dailyRateOverride ?? projectLecturer.lecturer?.dailyRate ?? 0
+      : projectLecturer.hourlyRateOverride ?? projectLecturer.lecturer?.hourlyRate ?? 0
+  }
+
+  lecturerUnit(projectLecturer: ProjectLecturer): string {
+    return projectLecturer?.daily ? 'Tagessatz' : 'Stundensatz'
+  }
+
+  lecturerCosts(projectLecturer: ProjectLecturer): number {
+    return (projectLecturer?.hours ?? 0) * this.lecturerRate(projectLecturer)
+  }
+
+  variableExpenseTotal(expense: OtherExpense | GroupSpecificExpense): number {
+    return (expense?.costs ?? 0) * (this.participants ?? 0)
   }
 
   get db1(): number {

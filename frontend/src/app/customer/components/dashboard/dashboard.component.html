@@ -1,17 +1,17 @@
-<div class="flex">
+<div class="app-shell">
   <p-megaMenu [model]="items" orientation="vertical" styleClass="admin-menu">
     <ng-template pTemplate="start">
-      <div class="flex justify-content-center">
+      <div class="app-shell-brand">
         <img src="assets/images/logo-transparent.png" height="65"  alt="FH Logo"/>
         <img src="assets/images/logo-innovations-transparent.png" height="65"  alt="Innovations Logo"/>
       </div>
-      <div class="flex justify-content-center mt-2">
+      <div class="app-shell-faculty">
         <h2 class="m-0 mb-3">{{authService.user.faculty.name}}</h2>
       </div>
     </ng-template>
   </p-megaMenu>
 
-  <div class="page-content p-4 flex-grow-1">
+  <div class="page-content">
     <!--    <p-card>-->
     <router-outlet></router-outlet>
     <!--    </p-card>-->

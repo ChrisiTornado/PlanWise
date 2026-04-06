@@ -7,7 +7,7 @@
     <p-table [value]="(companyService.models$|async)">
       <ng-template pTemplate="header">
         <tr>
-          <th pSortableColumn="image" style="width:20%">Firmenbild <p-sortIcon field="image"></p-sortIcon></th>
+          <th pSortableColumn="image" style="width:20%; text-align: left;">Firmenbild <p-sortIcon field="image"></p-sortIcon></th>
           <th pSortableColumn="name" style="width:20%">Name <p-sortIcon field="name"></p-sortIcon></th>
           <th>Bearbeiten</th>
           <th>Löschen</th>
@@ -15,7 +15,11 @@
       </ng-template>
       <ng-template pTemplate="body" let-company>
         <tr (click)="navigateToDetails(company)" style="cursor: pointer;">
-            <td><img src="{{company.image_url}}" alt="Company Image" style="max-height: 100px; max-width: 100%"></td>
+            <td class="text-left">
+              <div class="company-logo-cell">
+                <img src="{{company.image_url}}" alt="Company Image" class="company-logo">
+              </div>
+            </td>
           <td>{{company.name}}</td>
           <td >
             <app-update-company style="display: flex !important;" [company]="company" (click)="$event.stopPropagation()"></app-update-company>

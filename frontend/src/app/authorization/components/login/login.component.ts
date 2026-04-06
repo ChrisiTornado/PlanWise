@@ -14,6 +14,7 @@ import {ERole} from "../../../models/user.model";
 export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   loading: boolean;
+  submitted: boolean = false;
 
   constructor(private fb: FormBuilder,
               private authService: AuthService,
@@ -31,8 +32,11 @@ export class LoginComponent implements OnInit {
   }
 
   submit() {
-    if(this.loginForm.invalid)
+    this.submitted = true;
+    if(this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
       return;
+    }
 
     this.loading = true;
 

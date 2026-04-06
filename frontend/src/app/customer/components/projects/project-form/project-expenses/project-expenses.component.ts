@@ -73,6 +73,14 @@ export class ProjectExpensesComponent implements OnInit{
     });
   }
 
+  availableExpenses(i: number) {
+    const selectedIds = this.projectExpenses.controls
+      .map((control, index) => index === i ? null : control.get('expense')?.value?.id)
+      .filter(id => id != null);
+
+    return (this.expenseService.models ?? []).filter(expense => selectedIds.indexOf(expense.id) === -1);
+  }
+
   removeProjectExpense(i: number) {
     this.projectExpenses.removeAt(i);
   }

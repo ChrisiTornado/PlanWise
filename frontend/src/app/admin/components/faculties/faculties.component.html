@@ -4,14 +4,14 @@
 
     <p-dialog header="Fakultät anlegen" [(visible)]="visible" [modal]="true" [style]="{ width: '50vw' }"
               [draggable]="false" [resizable]="false" (onHide)="closeDialog()">
-      <form [formGroup]="createForm">
+      <form [formGroup]="createForm" [class.validation-submitted]="submitted">
 
         <div class="mb-4">
           <label for="name" class="block text-900 font-medium mb-2">Name</label>
           <input id="name" formControlName="name" type="text" placeholder="Name" pInputText pAutoFocus [autofocus]="true" class="w-full">
 
           <div style="position: relative">
-            <small style="position: absolute; color: red" *ngIf="name.hasError('required') && (name.touched || submitted)">Name ist erforderlich</small>
+            <small class="p-error" style="position: absolute" *ngIf="name.hasError('required') && submitted">Name ist erforderlich</small>
           </div>
         </div>
 
@@ -22,7 +22,7 @@
                          locale="de-DE" id="priceForCoursePerDay" formControlName="priceForCoursePerDay"  placeholder="Preis in €" class="flex-grow-1"></p-inputNumber>
 
           <div style="position: relative">
-            <small style="position: absolute; color: red" *ngIf="priceForCoursePerDay.hasError('required') && (name.touched || submitted)">Ein Preis ist erforderlich</small>
+            <small class="p-error" style="position: absolute" *ngIf="priceForCoursePerDay.hasError('required') && submitted">Ein Preis ist erforderlich</small>
           </div>
         </div>
 

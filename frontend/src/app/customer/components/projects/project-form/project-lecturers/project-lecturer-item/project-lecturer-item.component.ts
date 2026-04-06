@@ -14,7 +14,6 @@ import {Faculty} from "../../../../../../models/faculty.model";
 import {ERole} from "../../../../../../models/user.model";
 import {AutoFocus} from "primeng/autofocus";
 import {InputTextModule} from "primeng/inputtext";
-import {skip} from "rxjs";
 import {Lecturer} from "../../../../../../models/lecturer.model";
 
 @Component({
@@ -59,28 +58,50 @@ export class ProjectLecturerItemComponent implements OnInit, AfterViewInit{
     this.faculty = this.authService.user.role == ERole.ADMIN ? this.project.faculty : this.authService.user.faculty
 
     if(this.authService.user.role == ERole.ADMIN) {
-      this.lecturer.valueChanges.pipe(skip(1)).subscribe({
+      this.lecturer.valueChanges.subscribe({
         next: (lecturer: Lecturer) => {
+          if(!lecturer)
+            return
+
           if(this.daily.value) {
-            this.dailyRateOverride.setValue(this.lecturer.value.id == this.projectLecturer.lecturer.id ? (this.projectLecturer.dailyRateOverride ?? lecturer.dailyRate) : lecturer.dailyRate)
+            this.dailyRateOverride.setValue(this.projectLecturer && this.lecturer.value.id == this.projectLecturer.lecturer.id ? (this.projectLecturer.dailyRateOverride ?? lecturer.dailyRate) : lecturer.dailyRate)
           } else {
-            this.hourlyRateOverride.setValue(this.lecturer.value.id == this.projectLecturer.lecturer.id ? (this.projectLecturer.hourlyRateOverride ?? lecturer.hourlyRate) : lecturer.hourlyRate)
+            this.hourlyRateOverride.setValue(this.projectLecturer && this.lecturer.value.id == this.projectLecturer.lecturer.id ? (this.projectLecturer.hourlyRateOverride ?? lecturer.hourlyRate) : lecturer.hourlyRate)
           }
         }
       })
 
       this.daily.valueChanges.subscribe({
         next: (daily) => {
+          if(!this.lecturer.value)
+            return
+
           if (daily) {
             this.hourlyRateOverride.setValue(null)
-            this.dailyRateOverride.setValue((this.projectLecturer.dailyRateOverride && this.lecturer.value.id == this.projectLecturer.lecturer.id) ? this.projectLecturer.dailyRateOverride : this.lecturer.value.dailyRate)
+            this.dailyRateOverride.setValue((this.projectLecturer?.dailyRateOverride && this.lecturer.value.id == this.projectLecturer.lecturer.id) ? this.projectLecturer.dailyRateOverride : this.lecturer.value.dailyRate)
           } else {
             this.dailyRateOverride.setValue(null)
-            this.hourlyRateOverride.setValue((this.projectLecturer.hourlyRateOverride && this.lecturer.value.id == this.projectLecturer.lecturer.id) ? this.projectLecturer.hourlyRateOverride : this.lecturer.value.hourlyRate)
+            this.hourlyRateOverride.setValue((this.projectLecturer?.hourlyRateOverride && this.lecturer.value.id == this.projectLecturer.lecturer.id) ? this.projectLecturer.hourlyRateOverride : this.lecturer.value.hourlyRate)
           }
         }
       })
     }
+  }
+
+  get availableLecturers(): any[] {
+    const selectedIds = (this.projectForm.get('projectLecturers') as FormArray)
+      .controls
+      .map((control, index) => index === this.i ? null : control.get('lecturer')?.value?.id)
+      .filter(id => id != null);
+
+    if (!this.crossFaculty) {
+      return (this.dropDownLecturers ?? []).filter(lecturer => selectedIds.indexOf(lecturer.id) === -1);
+    }
+
+    return (this.dropDownLecturers ?? []).map(group => ({
+      ...group,
+      items: group.items.filter(lecturer => selectedIds.indexOf(lecturer.id) === -1)
+    })).filter(group => group.items.length > 0);
   }
 
   // Workaround
@@ -91,10 +112,13 @@ export class ProjectLecturerItemComponent implements OnInit, AfterViewInit{
   }
 
   getProjectLecturerValue() {
+    if(!this.projectLecturer?.lecturer)
+      return null
+
     if(this.crossFaculty) {
       this.useOtherSelected = true
       let dropdownGroup = this.dropDownLecturers.find(d => d.value.id == this.projectLecturer.lecturer.faculty.id);
-      return dropdownGroup.items.find(dl => dl.id == this.projectLecturer.lecturer.id);
+      return dropdownGroup?.items.find(dl => dl.id == this.projectLecturer.lecturer.id);
     } else {
       return this.dropDownLecturers.find(dl => this.projectLecturer.lecturer.id == dl.id);
     }
@@ -126,6 +150,10 @@ export class ProjectLecturerItemComponent implements OnInit, AfterViewInit{
 
   get dailyRateOverride(): AbstractControl {
     return this.projectLecturerControl.get("dailyRateOverride");
+  }
+
+  get selectedLecturer(): Lecturer | null {
+    return this.lecturer.value ?? null;
   }
 
   protected readonly ERole = ERole;

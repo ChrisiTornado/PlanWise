@@ -16,7 +16,7 @@ export class ProjectTypeService extends AResourceService<ProjectType> {
   }
 
   override getAll(): void {
-    this._loading.next(true);
+    if (!this.models?.length) this._loading.next(true);
     this.http.get<ProjectType[]>(environment.apiUrl + `project-types`)
       .pipe(finalizeLoading(this._loading, false))
       .subscribe({

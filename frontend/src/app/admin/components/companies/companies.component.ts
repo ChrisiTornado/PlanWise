@@ -50,7 +50,7 @@ export class CompaniesComponent implements OnInit {
 
   submit() {
     this.submitted = true;
-    if (this.createForm.invalid) return;
+    if (this.createForm.invalid) { this.createForm.markAllAsTouched(); return; }
 
     if (!this.selectedImage) {
       this.messageService.add({ severity: 'error', summary: 'Fehler', detail: 'Bitte ein Bild auswählen.' });
@@ -73,6 +73,12 @@ export class CompaniesComponent implements OnInit {
           this.messageService.add({ severity: 'error', summary: 'Fehler', detail: 'Unternehmen konnte nicht erstellt werden.' });
         }
       });
+  }
+
+  getImageSrc(): string {
+    const value = this.image?.value;
+    if (!value) return '';
+    return value.startsWith('data:image') ? value : 'data:image/png;base64,' + value;
   }
 
   get name(): AbstractControl {

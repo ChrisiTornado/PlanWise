@@ -19,7 +19,11 @@ class ProjectCategoryController extends Controller
 
     public function show(int $id)
     {
-        return new ProjectCategoryResource($this->projectCategoryRepository->getOne($id));
+        $projectCategory = $this->projectCategoryRepository->getOne($id);
+        if (!$projectCategory)
+            return response(null, 404);
+
+        return new ProjectCategoryResource($projectCategory);
     }
 
     public function store(StoreProjectCategoryRequest $request)
@@ -45,4 +49,3 @@ class ProjectCategoryController extends Controller
         return response(null, 204);
     }
 }
-

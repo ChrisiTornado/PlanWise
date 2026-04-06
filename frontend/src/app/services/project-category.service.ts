@@ -16,7 +16,7 @@ export class ProjectCategoryService extends AResourceService<ProjectCategory>{
   }
 
   override getAll(): void {
-    this._loading.next(true);
+    if (!this.models?.length) this._loading.next(true);
     this.http.get<ProjectCategory[]>(environment.apiUrl + `projectCategories`)
       .pipe(finalizeLoading(this._loading, false))
       .subscribe({

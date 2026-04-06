@@ -16,7 +16,7 @@ export class CompanyService extends AResourceService<Company> {
   }
 
   override getAll(): void {
-    this._loading.next(true)
+    if (!this.models?.length) this._loading.next(true)
     this.http.get<Company[]>(environment.apiUrl + `companies`)
       .pipe(finalizeLoading(this._loading, false))
       .subscribe({

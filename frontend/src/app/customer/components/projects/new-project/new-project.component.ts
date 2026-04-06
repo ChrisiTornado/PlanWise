@@ -47,8 +47,10 @@ export class NewProjectComponent implements OnInit{
 
   create() {
     this.submitted = true;
-    if(this.newProjectForm.invalid)
+    if(this.newProjectForm.invalid) {
+      this.newProjectForm.markAllAsTouched();
       return;
+    }
 
     this.loading = true;
 
@@ -64,8 +66,8 @@ export class NewProjectComponent implements OnInit{
       this.email.value,
       this.crossFaculty.value,
       this.notes.value,
-      this.projectExpenses.value,
-      this.projectLecturers.value,
+      this.deduplicateProjectExpenses(this.projectExpenses.value),
+      this.deduplicateProjectLecturers(this.projectLecturers.value),
       this.totalCost * 100,
       this.participants.value,
       this.duration.value,
@@ -150,5 +152,17 @@ export class NewProjectComponent implements OnInit{
 
   get crossFaculties(): FormArray {
     return this.newProjectForm.get("crossFaculties") as FormArray;
+  }
+
+  private deduplicateProjectLecturers(lecturers: any[]): any[] {
+    return Array.from(
+      new Map(lecturers.map(lecturer => [lecturer.lecturer?.id, lecturer])).values()
+    );
+  }
+
+  private deduplicateProjectExpenses(expenses: any[]): any[] {
+    return Array.from(
+      new Map(expenses.map(expense => [expense.expense?.id, expense])).values()
+    );
   }
 }

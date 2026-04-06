@@ -16,7 +16,7 @@ export class ExpenseService extends AResourceService<Expense>{
   }
 
   override getAll(): void {
-    this._loading.next(true);
+    if (!this.models?.length) this._loading.next(true);
     this.http.get<Expense[]>(environment.apiUrl + `expenses`)
       .pipe(finalizeLoading(this._loading, false))
       .subscribe({

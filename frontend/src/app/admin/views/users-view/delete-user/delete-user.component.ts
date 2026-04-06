@@ -1,5 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {finalize} from "rxjs";
+import {ConfirmationService} from "primeng/api";
 import {User} from "../../../../models/user.model";
 import {UserService} from "../../../../services/user.service";
 
@@ -14,16 +15,24 @@ export class DeleteUserComponent {
   @Input() user: User;
   loading: boolean;
 
-  constructor(private userService: UserService) {
+  constructor(private userService: UserService,
+              private confirmationService: ConfirmationService) {
   }
 
   delete() {
-    this.loading = true;
-    this.userService.delete(this.user.id)
-      .pipe(finalize(() => this.loading = false))
-      .subscribe({
-        next: () => {
-        }
-      })
+    this.confirmationService.confirm({
+      header: 'Benutzer löschen',
+      message: `Möchtest du "${this.user.email}" wirklich löschen?`,
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.loading = true;
+        this.userService.delete(this.user.id)
+          .pipe(finalize(() => this.loading = false))
+          .subscribe({
+            next: () => {
+            }
+          })
+      }
+    });
   }
 }

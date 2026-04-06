@@ -1,126 +1,163 @@
-<div class="flex justify-content-between gap-5 mb-4">
-  <div>Dauer: {{duration}} Tage</div>
-  <div>Teilnehmeranzahl: {{participants}}</div>
-  <div>Preis/Teilnehmer: {{priceForCoursePerDay | currency:"EUR"}}</div>
-</div>
-
-<div class="flex flex-wrap justify-content-between gap-6">
-
-
-  <div class="font-light text-right flex flex-column align-items-end">
-    <strong>Kvar</strong>
-    <div *ngFor="let otherExpense of variableOtherExpenses"
-         class="flex gap-3 text-sm">
-      <span>{{ otherExpense.name }}</span>
-      <span>{{ otherExpense.costs | currency: "EUR" }}</span>
+<div class="calculation-panel">
+  <div *ngIf="showRevenue" class="flex flex-wrap justify-content-between gap-4 mb-4">
+    <div>
+      <div class="text-sm text-500">Teilnehmeranzahl</div>
+      <strong>{{ participants || 0 }}</strong>
     </div>
-    <hr class="w-full">
-    <span>{{ variableOtherExpensesCosts| currency: "EUR" }}</span>
+    <div>
+      <div class="text-sm text-500">Dauer</div>
+      <strong>{{ duration || 0 }} Tage</strong>
+    </div>
+    <div>
+      <div class="text-sm text-500">Preis pro Tag</div>
+      <strong>{{ (priceForCoursePerDay || 0) | currency:"EUR" }}</strong>
+    </div>
+    <div>
+      <div class="text-sm text-500">Umsatz pro Teilnehmer</div>
+      <strong>{{ revenuePerParticipant | currency:"EUR" }}</strong>
+    </div>
   </div>
 
-  <div class="font-light text-right flex flex-column align-items-end">
-    <strong>Kfix</strong>
-    <div class="flex gap-3 text-sm">
-      <span>Vortragende</span>
-      <span>{{ Utils.getLecturersCosts(projectLecturers) | currency: "EUR" }}</span>
-    </div>
-    <div *ngFor="let projectExpense of projectExpenses"
-         class="flex gap-3 text-sm">
-      <span>{{ projectExpense.expense.name }}</span>
-      <span>{{ projectExpense.costs | currency: "EUR" }}</span>
-    </div>
-    <div *ngFor="let otherExpense of fixOtherExpenses"
-         class="flex gap-3 text-sm">
-      <span>{{ otherExpense.name }}</span>
-      <span>{{ otherExpense.costs | currency: "EUR" }}</span>
-    </div>
-    <hr class="w-full">
-    <span>{{ allFixedCosts| currency: "EUR" }}</span>
-  </div>
-
-  <div class="font-light text-right flex flex-column align-items-end">
-    <strong>KProj. spezifisch</strong>
-    <div *ngFor="let groupSpecificExpense of fixGroupSpecificExpenses"
-         class="flex gap-3 text-sm">
-      <span>{{ groupSpecificExpense.name }}</span>
-      <span>{{ groupSpecificExpense.costs | currency: "EUR" }}</span>
-    </div>
-    <div *ngFor="let groupSpecificExpense of variableGroupSpecificExpenses"
-         class="flex gap-3 text-sm">
-      <span>{{ groupSpecificExpense.name }}</span>
-      <span>{{ groupSpecificExpense.costs * participants | currency: "EUR" }}</span>
-    </div>
-    <hr class="w-full">
-    <span>{{ totalGroupSpecificCosts| currency: "EUR" }}</span>
-  </div>
-
-  <div class="font-light text-right flex flex-column align-items-end">
-    <strong>Kalkulation</strong>
-    <div class="text-sm text-right flex flex-column align-items-end">
-      <div class="flex gap-3">
-        <span>Anzahl TN</span>
-        <span>{{ participants }}</span>
+  <div class="calculation-grid">
+    <section *ngIf="showRevenue" class="calculation-section calculation-section-wide">
+      <h4>1. Einnahmen</h4>
+      <div class="calculation-row">
+        <span>Preis pro Tag</span>
+        <span>{{ (priceForCoursePerDay || 0) | currency:"EUR" }}</span>
       </div>
-      <div class="flex gap-3">
-        <span>Einnahmen/TN</span>
-        <span>{{ priceForCoursePerDay | currency : "EUR" }}</span>
-      </div>
-<!--      <div class="flex gap-3">-->
-<!--        <span>Erlösschmälerung</span>-->
-<!--        <span></span>-->
-<!--      </div>-->
-      <div class="flex gap-3">
+      <div class="calculation-row">
         <span>Dauer</span>
-        <span>{{ duration }}</span>
+        <span>{{ duration || 0 }} Tage</span>
       </div>
-      <hr class="w-full">
-      <div class="flex gap-3">
-        <span>Nettoumsatz</span>
-        <span>{{ revenue | currency: "EUR" }}</span>
+      <div class="calculation-row">
+        <span>Preis pro Teilnehmer</span>
+        <span>{{ (priceForCoursePerDay || 0) | currency:"EUR" }} x {{ duration || 0 }} = <strong>{{ revenuePerParticipant | currency:"EUR" }}</strong></span>
       </div>
-      <div class="flex gap-3">
-        <span>- Kvar</span>
-        <span>{{ variableOtherExpensesCosts | currency: "EUR" }}</span>
+      <div class="calculation-row">
+        <span>Teilnehmer</span>
+        <span>{{ participants || 0 }}</span>
       </div>
-      <hr class="w-full">
-      <div class="flex gap-3">
-        <span>DB 1</span>
-        <span>{{ db1 | currency: "EUR" }}</span>
+      <hr>
+      <div class="calculation-row calculation-row-total">
+        <span>Einnahmen gesamt</span>
+        <strong>{{ revenuePerParticipant | currency:"EUR" }} x {{ participants || 0 }} = {{ revenue | currency:"EUR" }}</strong>
       </div>
-      <div class="flex gap-3">
-        <span>DBU 1</span>
-        <span>{{ dbU1 | number : '1.2-2' }} %</span>
+      <small *ngIf="!hasRevenueInputs" class="text-500">
+        Teilnehmeranzahl, Dauer und Preis pro Tag müssen gefüllt sein, damit die Einnahmen vollständig berechnet werden.
+      </small>
+    </section>
+
+    <section class="calculation-section">
+      <h4>{{ showRevenue ? '2.' : '1.' }} Vortragende</h4>
+      <div *ngFor="let projectLecturer of projectLecturers ?? []" class="calculation-item">
+        <div class="calculation-row">
+          <span>{{ projectLecturer.lecturer?.name || 'Vortragende:r' }}</span>
+          <strong>{{ lecturerCosts(projectLecturer) | currency:"EUR" }}</strong>
+        </div>
+        <small>{{ projectLecturer.hours || 0 }} x {{ lecturerUnit(projectLecturer) }} {{ lecturerRate(projectLecturer) | currency:"EUR" }}</small>
       </div>
-      <div class="flex gap-3">
-        <span>- Kfix</span>
-        <span>{{ allFixedCosts | currency: "EUR" }}</span>
+      <div *ngIf="!(projectLecturers ?? []).length" class="text-sm text-500">Keine Vortragenden erfasst.</div>
+      <div class="calculation-row">
+        <span>Vortragende gesamt</span>
+        <strong>{{ lecturersCosts | currency:"EUR" }}</strong>
       </div>
-      <hr class="w-full">
-      <div class="flex gap-3">
-        <span>DB 2</span>
-        <span>{{ db2 | currency: "EUR" }}</span>
+    </section>
+
+    <section class="calculation-section">
+      <h4>{{ showRevenue ? '3.' : '2.' }} Projektaufwände</h4>
+      <div *ngFor="let projectExpense of projectExpenses ?? []" class="calculation-row">
+        <span>{{ projectExpense.expense?.name || 'Aufwand' }}</span>
+        <span>{{ (projectExpense.costs || 0) | currency:"EUR" }}</span>
       </div>
-      <div class="flex gap-3">
-        <span>DBU 2</span>
-        <span>{{ dbU2 | number : '1.2-2' }} %</span>
+      <div *ngIf="!(projectExpenses ?? []).length" class="text-sm text-500">Keine Projektaufwände erfasst.</div>
+      <hr>
+      <div class="calculation-row">
+        <span>Projektaufwände gesamt</span>
+        <strong>{{ projectExpensesCosts | currency:"EUR" }}</strong>
       </div>
-      <div class="flex gap-3">
-        <span>- KProj. spezifisch</span>
-        <span>{{ totalGroupSpecificCosts | currency: "EUR" }}</span>
+    </section>
+
+    <section *ngIf="showAdminCosts" class="calculation-section">
+      <h4>{{ showRevenue ? '4.' : '3.' }} Variable Kosten pro Teilnehmer</h4>
+      <div *ngFor="let otherExpense of variableOtherExpenses" class="calculation-item">
+        <div class="calculation-row">
+          <span>{{ otherExpense.name }}</span>
+          <strong>{{ variableExpenseTotal(otherExpense) | currency:"EUR" }}</strong>
+        </div>
+        <small>{{ otherExpense.costs | currency:"EUR" }} x {{ participants || 0 }} Teilnehmer</small>
       </div>
-      <hr class="w-full">
-      <div class="flex gap-3">
-        <span>DB 3</span>
-        <span>{{ db3 | currency: "EUR" }}</span>
+      <div *ngFor="let groupExpense of variableGroupSpecificExpenses" class="calculation-item">
+        <div class="calculation-row">
+          <span>{{ groupExpense.name }}</span>
+          <strong>{{ variableExpenseTotal(groupExpense) | currency:"EUR" }}</strong>
+        </div>
+        <small>{{ groupExpense.costs | currency:"EUR" }} x {{ participants || 0 }} Teilnehmer</small>
       </div>
-      <div class="flex gap-3">
-        <span>DBU 3</span>
-        <span>{{ dbU3 | number : '1.2-2' }} %</span>
+      <div *ngIf="!variableOtherExpenses.length && !variableGroupSpecificExpenses.length" class="text-sm text-500">Keine variablen Kosten pro Teilnehmer erfasst.</div>
+      <hr>
+      <div class="calculation-row">
+        <span>Variable Kosten pro Teilnehmer</span>
+        <strong>{{ variableCostsPerParticipant | currency:"EUR" }}</strong>
       </div>
-    </div>
+      <div class="calculation-row">
+        <span>Variable Kosten gesamt</span>
+        <strong>{{ variableCostsPerParticipant | currency:"EUR" }} x {{ participants || 0 }} = {{ variableCostsTotal | currency:"EUR" }}</strong>
+      </div>
+    </section>
+
+    <section *ngIf="showAdminCosts" class="calculation-section">
+      <h4>{{ showRevenue ? '5.' : '4.' }} Weitere fixe Kosten</h4>
+      <div *ngFor="let otherExpense of fixOtherExpenses" class="calculation-row">
+        <span>{{ otherExpense.name }}</span>
+        <span>{{ otherExpense.costs | currency:"EUR" }}</span>
+      </div>
+      <div *ngFor="let groupExpense of fixGroupSpecificExpenses" class="calculation-row">
+        <span>{{ groupExpense.name }}</span>
+        <span>{{ groupExpense.costs | currency:"EUR" }}</span>
+      </div>
+      <div *ngIf="!fixOtherExpenses.length && !fixGroupSpecificExpenses.length" class="text-sm text-500">Keine weiteren fixen Kosten erfasst.</div>
+      <hr>
+      <div class="calculation-row">
+        <span>Weitere fixe Kosten gesamt</span>
+        <strong>{{ fixedOtherCosts | currency:"EUR" }}</strong>
+      </div>
+    </section>
+
+    <section class="calculation-section calculation-section-wide">
+      <h4>{{ resultStepLabel }} Gesamtkosten{{ showRevenue ? ' und Ergebnis' : '' }}</h4>
+      <div class="calculation-row">
+        <span>Fixkosten gesamt</span>
+        <span *ngIf="showAdminCosts">{{ lecturersCosts | currency:"EUR" }} + {{ projectExpensesCosts | currency:"EUR" }} + {{ fixedOtherCosts | currency:"EUR" }} = <strong>{{ allFixedCosts | currency:"EUR" }}</strong></span>
+        <span *ngIf="!showAdminCosts">{{ lecturersCosts | currency:"EUR" }} + {{ projectExpensesCosts | currency:"EUR" }} = <strong>{{ allFixedCosts | currency:"EUR" }}</strong></span>
+      </div>
+      <div *ngIf="showAdminCosts" class="calculation-row">
+        <span>Variable Kosten gesamt</span>
+        <span>{{ variableCostsPerParticipant | currency:"EUR" }} x {{ participants || 0 }} = <strong>{{ variableCostsTotal | currency:"EUR" }}</strong></span>
+      </div>
+      <div class="calculation-row">
+        <span>Gesamtkosten</span>
+        <strong *ngIf="showAdminCosts">{{ allFixedCosts | currency:"EUR" }} + {{ variableCostsTotal | currency:"EUR" }} = {{ totalCosts | currency:"EUR" }}</strong>
+        <strong *ngIf="!showAdminCosts">{{ totalCosts | currency:"EUR" }}</strong>
+      </div>
+      <div *ngIf="showRevenue" class="calculation-row">
+        <span>Deckungsbeitrag pro Teilnehmer</span>
+        <strong>{{ contributionMarginPerParticipant | currency:"EUR" }}</strong>
+      </div>
+      <div *ngIf="showRevenue" class="calculation-row">
+        <span>Break-even</span>
+        <strong *ngIf="breakEvenParticipants !== null">ab {{ breakEvenParticipants }} Teilnehmer{{ breakEvenParticipants === 1 ? '' : 'n' }}</strong>
+        <strong *ngIf="breakEvenParticipants === null" class="text-red-500">nicht erreichbar</strong>
+      </div>
+      <div *ngIf="showRevenue" class="calculation-row">
+        <span>Gewinn / Verlust</span>
+        <strong [class.text-primary]="hasProfit" [class.text-red-500]="!hasProfit">
+          {{ revenue | currency:"EUR" }} - {{ totalCosts | currency:"EUR" }} = {{ profit | currency:"EUR" }}
+        </strong>
+      </div>
+      <div *ngIf="showRevenue" class="result-message" [class.result-message-profit]="hasProfit" [class.result-message-loss]="!hasProfit">
+        <i [class]="hasProfit ? 'pi pi-check-circle' : 'pi pi-exclamation-triangle'"></i>
+        <strong>{{ hasProfit ? 'Aktuell macht das Projekt Gewinn.' : 'Aktuell macht das Projekt Verlust.' }}</strong>
+      </div>
+    </section>
   </div>
-
-
 </div>
-
-

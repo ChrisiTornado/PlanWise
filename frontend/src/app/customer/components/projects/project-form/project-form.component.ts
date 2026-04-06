@@ -200,19 +200,65 @@ export class ProjectFormComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    let otherExpenses = this.authService.user.role == ERole.ADMIN ? this.otherExpenses.value : (this.project ? this.project.otherExpenses : null)
-    let groupSpecificExpenses = this.authService.user.role == ERole.ADMIN ? this.groupSpecificExpenses.value : (this.project ? this.project.groupSpecificExpenses : null)
-
-    this.totalCost = Utils.calculateProjectCosts(this.projectLecturers.value, this.projectExpenses.value, otherExpenses, this.participants.value, groupSpecificExpenses);
+    this.totalCost = Utils.calculateProjectCosts(this.projectLecturers.value, this.projectExpenses.value, this.calculationOtherExpenses, this.participants.value, this.calculationGroupSpecificExpenses);
     if(!this.isCourse)
       return;
 
-    if(this.participants.invalid) {
+    if(this.participants.invalid || this.duration.invalid) {
       this.revenue = null
       return
     }
 
     this.revenue = this.participants.value * (this.priceForCoursePerDayOverride.value ?? this.faculty.priceForCoursePerDay) * this.duration.value
+  }
+
+  get calculationOtherExpenses(): any[] {
+    return this.isAdmin ? this.otherExpenses.value : []
+  }
+
+  get calculationGroupSpecificExpenses(): any[] {
+    return this.isAdmin ? this.groupSpecificExpenses.value : []
+  }
+
+  get isAdmin(): boolean {
+    return this.authService.user?.role == ERole.ADMIN
+  }
+
+  get canShowDetailedCalculations(): boolean {
+    return this.isCourse || this.isAdmin
+  }
+
+  get breakEvenParticipants(): number | null {
+    if (!this.isCourse)
+      return null
+
+    return Utils.getBreakEvenParticipants(
+      this.projectLecturers.value,
+      this.projectExpenses.value,
+      this.calculationOtherExpenses,
+      this.calculationGroupSpecificExpenses,
+      this.duration.value,
+      this.priceForCoursePerDayOverride.value
+    )
+  }
+
+  get projectProfit(): number {
+    if (!this.isCourse)
+      return null
+
+    return Utils.getProfit(
+      this.projectLecturers.value,
+      this.projectExpenses.value,
+      this.calculationOtherExpenses,
+      this.calculationGroupSpecificExpenses,
+      this.participants.value,
+      this.duration.value,
+      this.priceForCoursePerDayOverride.value
+    )
+  }
+
+  get projectHasProfit(): boolean {
+    return this.projectProfit >= 0
   }
 
   get company(): AbstractControl {

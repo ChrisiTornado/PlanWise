@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 
 class ProjectController extends Controller
@@ -113,22 +114,19 @@ class ProjectController extends Controller
                 $facultyId
             );
 
-            foreach ($request->lecturers as $lecturer) {
+            foreach (collect($request->lecturers)->unique('id')->values() as $lecturer) {
                 $this->projectLecturerRepository->create($project->id, $lecturer['id'], $lecturer['hours'], $lecturer['daily']);
             }
-            foreach ($request->expenses as $expense) {
+            foreach (collect($request->expenses)->unique('id')->values() as $expense) {
                 $this->projectExpenseRepository->create($project->id, $expense['id'], $expense['costs']);
             }
             foreach ($request->crossFaculties as $f) {
                 $this->projectFacultyRepository->create($project->id, $f['id']);
             }
 
-            foreach ($this->notificationRepository->getAll() as $notification) {
-                if($notification->activated)
-                    Mail::to($notification->email)->send(new NewProjectMail($project));
-            }
-
             DB::commit();
+
+            $this->sendProjectNotifications($project);
         } catch (\Exception $e) {
             DB::rollBack();
             return response('Project could not be created: ' . $e->getMessage(), 500);
@@ -256,6 +254,7 @@ class ProjectController extends Controller
 
     private function _updateLecturers(array $lecturers, $projectId)
     {
+        $lecturers = collect($lecturers)->unique('id')->values()->all();
         $currentLecturerIds = $this->projectLecturerRepository->getLecturerIdsByProjectId($projectId);
         $newLecturerIds = array_map(function ($lecturer) {
             return $lecturer['id'];
@@ -288,6 +287,7 @@ class ProjectController extends Controller
 
     private function _updateExpenses(array $expenses, $projectId)
     {
+        $expenses = collect($expenses)->unique('id')->values()->all();
         $currentExpenseIds = $this->projectExpenseRepository->getExpenseIdsByProjectId($projectId);
         $newExpenseIds = array_map(function ($expense) {
             return $expense['id'];
@@ -385,5 +385,36 @@ class ProjectController extends Controller
             }
         }
     }
-}
 
+    private function sendProjectNotifications($project): void
+    {
+        if ($this->mailTransportIsMissingCredentials()) {
+            Log::info('Project notification mails skipped because SMTP credentials are missing.', [
+                'project_id' => $project->id,
+            ]);
+            return;
+        }
+
+        foreach ($this->notificationRepository->getAll() as $notification) {
+            if(!$notification->activated) {
+                continue;
+            }
+
+            try {
+                Mail::to($notification->email)->send(new NewProjectMail($project));
+            } catch (\Exception $mailException) {
+                Log::warning('Project notification mail could not be sent', [
+                    'project_id' => $project->id,
+                    'notification_id' => $notification->id,
+                    'message' => $mailException->getMessage(),
+                ]);
+            }
+        }
+    }
+
+    private function mailTransportIsMissingCredentials(): bool
+    {
+        return config('mail.default') === 'smtp'
+            && Str::of((string) config('mail.mailers.smtp.password'))->trim()->isEmpty();
+    }
+}

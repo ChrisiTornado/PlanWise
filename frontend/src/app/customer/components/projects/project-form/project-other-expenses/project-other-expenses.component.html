@@ -7,18 +7,18 @@
 
         <input type="hidden" [value]="i" formControlName="id">
 
-        <p-floatLabel>
+        <div class="flex flex-column align-items-start gap-1">
+          <label [for]="!project ? 'new-other-expense-name-' + i : 'project-' + project.id + '-' + 'other-expense-name-' + i">Bezeichnung</label>
           <input pInputText [id]="!project ? 'new-other-expense-name-' + i : 'project-' + project.id + '-' + 'other-expense-name-' + i"
                  formControlName="name" />
-          <label [for]="!project ? 'new-other-expense-name-' + i : 'project-' + project.id + '-' + 'other-expense-name-' + i">Bezeichnung</label>
-        </p-floatLabel>
+        </div>
 
-        <p-floatLabel>
+        <div class="flex flex-column align-items-start gap-1">
+          <label [for]="!project ? 'new-other-expense-costs-' + i : 'new-project-' + project.id + '-' + 'other-expense-costs-' + i">Kosten</label>
           <p-inputNumber [inputId]="!project ? 'new-other-expense-costs-' + i : 'new-project-' + project.id + '-' + 'other-expense-costs-' + i"
                          formControlName="costs" mode="currency" currency="EUR"
                          locale="de-DE" />
-          <label [for]="!project ? 'new-other-expense-costs-' + i : 'new-project-' + project.id + '-' + 'other-expense-costs-' + i">Kosten</label>
-        </p-floatLabel>
+        </div>
 
         <p-checkbox *ngIf="isCourse"
           formControlName="perParticipant"

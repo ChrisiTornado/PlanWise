@@ -33,26 +33,26 @@ export abstract class AResourceService<M extends AModel> {
     this.modelsStorageName = modelsStorageName
     let savedModels = fetchStorage ? JSON.parse(sessionStorage.getItem(modelsStorageName)) : null;
     this._models = new BehaviorSubject<M[]>(savedModels);
-    this._loading = new BehaviorSubject<boolean>(null);
+    this._loading = new BehaviorSubject<boolean>(false);
   }
 
   public abstract getAll(): void
 
   public addModel(model: M) {
-    let m = this.models
+    let m = this.models ?? []
     m.push(model)
     this.models = m
   }
 
   public updateModel(model: M) {
-    this.models = this.models.map(m => m.id == model.id ? model : m)
+    this.models = (this.models ?? []).map(m => m.id == model.id ? model : m)
   }
 
   public removeModel(id: number) {
-    this.models = this.models.filter(m => m.id !== id);
+    this.models = (this.models ?? []).filter(m => m.id !== id);
   }
 
   public reset() {
-    this.models = null
+    this.models = []
   }
 }

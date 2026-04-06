@@ -56,8 +56,7 @@ export class UpdateCompanyComponent {
 
   submit() {
     this.submitted = true;
-    if(this.createForm.invalid)
-      return;
+    if (this.createForm.invalid) { this.createForm.markAllAsTouched(); return; }
 
     this.loading = true;
     const formData = new FormData();

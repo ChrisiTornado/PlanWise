@@ -1,5 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {finalize} from "rxjs";
+import {ConfirmationService} from "primeng/api";
 import {Faculty} from "../../../../models/faculty.model";
 import {FacultyService} from "../../../../services/faculty.service";
 
@@ -14,16 +15,24 @@ export class DeleteFacultyComponent {
   @Input() faculty: Faculty;
   loading: boolean;
 
-  constructor(private facultyService: FacultyService) {
+  constructor(private facultyService: FacultyService,
+              private confirmationService: ConfirmationService) {
   }
 
   delete() {
-    this.loading = true;
-    this.facultyService.delete(this.faculty.id)
-      .pipe(finalize(() => this.loading = false))
-      .subscribe({
-        next: () => {
-        }
-      })
+    this.confirmationService.confirm({
+      header: 'Fakultät löschen',
+      message: `Möchtest du "${this.faculty.name}" wirklich löschen?`,
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.loading = true;
+        this.facultyService.delete(this.faculty.id)
+          .pipe(finalize(() => this.loading = false))
+          .subscribe({
+            next: () => {
+            }
+          })
+      }
+    });
   }
 }

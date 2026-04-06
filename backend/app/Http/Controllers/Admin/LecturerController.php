@@ -15,14 +15,18 @@ class LecturerController extends Controller
     public function __construct(protected ILecturerRepository $lecturerRepository)
     {}
 
-    public function index()
+    public function index(int $facultyId)
     {
-        return LecturerResource::collection($this->lecturerRepository->getAll());
+        return LecturerResource::collection($this->lecturerRepository->getWhere('faculty_id', $facultyId));
     }
 
-    public function show(int $id)
+    public function show(int $facultyId, int $id)
     {
-        return new LecturerResource($this->lecturerRepository->getOne($id));
+        $lecturer = $this->lecturerRepository->getOne($id);
+        if (!$lecturer || $lecturer->faculty_id !== $facultyId)
+            return response(null, 404);
+
+        return new LecturerResource($lecturer);
     }
 
     public function store(StoreLecturerRequest $request, Faculty $faculty)
@@ -35,17 +39,19 @@ class LecturerController extends Controller
         ));
     }
 
-   public function update(StoreLecturerRequest $request)
+   public function update(StoreLecturerRequest $request, int $facultyId, int $id)
    {
-       if(!$this->lecturerRepository->getOne($request->id))
+       $lecturer = $this->lecturerRepository->getOne($id);
+       if (!$lecturer || $lecturer->faculty_id !== $facultyId)
            return response(null, 404);
 
-       return new StoreLecturerRequest((array)$this->lecturerRepository->update($request->id, $request->name, $request->hourlyRate, $request->dailyRate, $request->facultyId));
+       return new LecturerResource($this->lecturerRepository->update($id, $request->name, $request->hourlyRate, $request->dailyRate, $facultyId));
    }
 
-    public function destroy(int $id)
+    public function destroy(int $facultyId, int $id)
     {
-        if(!$this->lecturerRepository->getOne($id))
+        $lecturer = $this->lecturerRepository->getOne($id);
+        if (!$lecturer || $lecturer->faculty_id !== $facultyId)
             return response(null, 404);
 
         $this->lecturerRepository->delete($id);
@@ -53,4 +59,3 @@ class LecturerController extends Controller
         return response(null, 204);
     }
 }
-

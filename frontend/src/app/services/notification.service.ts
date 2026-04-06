@@ -15,7 +15,7 @@ export class NotificationService extends AResourceService<Notification>{
   }
 
   override getAll() {
-    this._loading.next(true);
+    if (!this.models?.length) this._loading.next(true);
     this.http.get<Notification[]>(environment.adminApiUrl + 'notifications')
       .pipe(finalizeLoading(this._loading, false))
       .subscribe({

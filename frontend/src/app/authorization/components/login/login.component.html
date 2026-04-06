@@ -1,10 +1,12 @@
 <app-auth-container [title]="'Willkommen!'">
-  <form [formGroup]="loginForm">
+  <form [formGroup]="loginForm" [class.validation-submitted]="submitted">
     <label for="email" class="block text-900 font-medium mb-2">Benutzer</label>
     <input id="email" formControlName="email" type="text" placeholder="E-Mail-Adresse" pInputText pAutoFocus [autofocus]="true" class="w-full mb-3">
+    <small *ngIf="submitted && email.invalid" class="p-error block mb-3">Bitte gib eine gültige E-Mail-Adresse ein.</small>
 
     <label for="password" class="block text-900 font-medium mb-2">Passwort</label>
     <input id="password" formControlName="password" type="password" placeholder="Passwort" pInputText class="w-full mb-3">
+    <small *ngIf="submitted && password.invalid" class="p-error block mb-3">Bitte gib dein Passwort ein.</small>
 
     <div class="flex align-items-center justify-content-between mb-4">
       <a (click)="resetPasswort()" class="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">Passwort vergessen?</a>

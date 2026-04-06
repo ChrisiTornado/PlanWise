@@ -1,13 +1,13 @@
-<div class="flex align-items-end gap-4 mb-3">
+<div class="view-header">
   <h1 class="m-0">Projekte</h1>
 
   <p-button *ngIf="authService.user.role != ERole.ADMIN" routerLink="new-project" pRipple label="Projekt anlegen"
-            class="p-button-outlined p-button-raised"></p-button>
+            icon="pi pi-plus"></p-button>
 </div>
 
-<div>
+<div class="filter-panel">
 
-  <div class="mt-4 flex gap-4 flex-wrap">
+  <div class="filter-grid">
 
     <p-floatLabel *ngIf="(authService.user$|async).role == ERole.ADMIN && !faculty()">
       <p-dropdown
@@ -102,7 +102,7 @@
       <label for="dateCreatedFrom">Projekt erstellt bis</label>
     </p-floatLabel>
 
-    <p-button [outlined]="true" label="Filter zurücksetzen"
+    <p-button [outlined]="true" label="Filter zurücksetzen" icon="pi pi-filter-slash"
               (click)="clearFilters()"/>
   </div>
 
@@ -111,7 +111,7 @@
 <ng-container *ngIf="(projectService.models$|async) && !(projectService.loading$|async); else loadingSpinner">
   <div
     *ngIf="projectService.filteredProjects$(projectTypeFilter, facultyFilter, companyFilter, dateUntil, dateFrom, dateCreatedUntil, dateCreatedFrom) | async as filteredProjects">
-    <div class="mt-4 flex align-items-center gap-4">
+    <div class="project-list-toolbar">
       <span>{{ filteredProjects.length == 0 ? 'Keine Projekte vorhanden.' : (filteredProjects.length) + ' Projekte' }}</span>
       <p-button *ngIf="filteredProjects.length > 0" [outlined]="false" label="CSV Export" [loading]="exportLoading" (click)="exportCSV(filteredProjects)" />
     </div>
@@ -120,40 +120,33 @@
         *ngFor="let project of filteredProjects"
         class="col-12 md:col-6 lg:col-3 xl:col-2" style="position: relative">
 
-        <div *ngIf="!project.isOpened && authService.user.role == ERole.ADMIN;"
-             pBadge
-             value="neu"
-             severity="success"
-             style="right: 10px; top: 5px;"></div>
+        <div class="project-tile">
+          <span *ngIf="!project.isOpened && authService.user.role == ERole.ADMIN;"
+                class="app-new-project-badge">neu</span>
+          <span *ngIf="project.isOpened && authService.user.role != ERole.ADMIN;"
+                class="app-project-opened-indicator app-project-opened"
+                pTooltip="Wurde schon angesehen">
+            <i class="pi pi-eye"></i>
+          </span>
+          <span *ngIf="!project.isOpened && authService.user.role != ERole.ADMIN;"
+                class="app-project-opened-indicator app-project-unopened"
+                pTooltip="Wurde nicht angesehen">
+            <i class="pi pi-eye-slash"></i>
+          </span>
 
-        <div *ngIf="project.isOpened && authService.user.role != ERole.ADMIN;"
-             style="position: absolute; right: 12px; top: 12px;"
-             class="text-primary"
-             pTooltip="Wurde schon angesehen">
-          <i class="pi pi-eye" style="font-size: 1.25rem"></i>
-        </div>
-        <div *ngIf="!project.isOpened && authService.user.role != ERole.ADMIN;"
-             style="position: absolute; right: 12px; top: 12px;"
-             class="text-orange-400"
-             pTooltip="Wurde nicht angesehen">
-          <i class="pi pi-eye-slash" style="font-size: 1.25rem"></i>
-        </div>
-
-
-        <div class="surface-card shadow-2 p-3 border-round flex flex-column align-items-center cursor-pointer">
-
-          <a [routerLink]="'' + project.id" style="text-decoration: none">
+          <a [routerLink]="'' + project.id">
             <div class="flex align-items-center flex-column mb-2">
           <span *ngIf="authService.user.role == ERole.ADMIN" class="block text-500 text-center font-medium mb-2">
             {{ project.faculty.name }}
           </span>
               <p-badge [value]="project.projectType.name" severity="info"/>
-              <img src="{{project.company.image_url}}" class="mt-1" alt="Company Image"
-                   style="max-height: 100px; max-width: 100%">
+              <div class="project-card-logo mt-1">
+                <img src="{{project.company.image_url}}" alt="Company Image">
+              </div>
             </div>
 
-            <span class="block text-900 text-center font-medium text-xl mb-2">{{ project.name }}</span>
-            <span class="block text-center text-500">{{ project.costs|currency:"EUR" }}</span>
+            <span class="project-tile-title">{{ project.name }}</span>
+            <span class="project-tile-cost">{{ project.costs|currency:"EUR" }}</span>
           </a>
 
           <div class="flex mt-2 justify-content-center">

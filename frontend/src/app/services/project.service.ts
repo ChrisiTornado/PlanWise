@@ -29,7 +29,7 @@ export class ProjectService extends AResourceService<Project> {
   ): Observable<Project[]> {
     return this._models.asObservable().pipe(
       map(projects =>
-        projects.filter((project) => {
+        (projects ?? []).filter((project) => {
           const matchesProjectType = projectType == null || project.projectType.id === projectType.id;
           const matchesFaculty = faculty == null || project.faculty.id === faculty.id;
           const matchesCompany = company == null || project.company.id === company.id;
@@ -61,14 +61,14 @@ export class ProjectService extends AResourceService<Project> {
   }
 
   override getAll(): void {
-    this._loading.next(true)
+    if (!this.models?.length) this._loading.next(true)
     this.http.get<Project[]>(environment.adminApiUrl + `projects`)
       .pipe(finalizeLoading(this._loading, false))
       .subscribe(projects => this.models = projects)
   }
 
   getAllByFaculty(facultyId: number): void {
-    this._loading.next(true)
+    if (!this.models?.length) this._loading.next(true)
     this.http.get<Project[]>(environment.apiUrl + `faculties/${facultyId}/projects`)
       .pipe(finalizeLoading(this._loading, false))
       .subscribe(projects => this.models = projects);
@@ -115,7 +115,7 @@ export class ProjectService extends AResourceService<Project> {
         email,
         crossFaculty,
         notes,
-        expenses: expenses.map(e =>({id: e.expense.id, costs: e.costs * 100})),
+        expenses: this.deduplicateExpenses(expenses).map(e =>({id: e.expense.id, costs: e.costs * 100})),
         lecturers: lecturers.map(l =>({id: l.lecturer.id, hours: l.hours, daily: l.daily})),
         costs,
         participants,
@@ -170,7 +170,7 @@ export class ProjectService extends AResourceService<Project> {
         email,
         crossFaculty,
         notes,
-        expenses: expenses.map(e =>({id: e.expense.id, costs: e.costs * 100})),
+        expenses: this.deduplicateExpenses(expenses).map(e =>({id: e.expense.id, costs: e.costs * 100})),
         lecturers: lecturers.map(l =>({id: l.lecturer.id, hours: l.hours, daily: l.daily, hourlyRateOverride: l.hourlyRateOverride ? l.hourlyRateOverride * 100 : null, dailyRateOverride: l.dailyRateOverride ? l.dailyRateOverride * 100 : null})),
         costs,
         participants,
@@ -223,5 +223,11 @@ export class ProjectService extends AResourceService<Project> {
     this.http.get<Project[]>(environment.adminApiUrl + `projects/fetch-faculties/${id}`)
       .pipe(finalize(() => this._loading.next(false)))
       .subscribe(projects => this.models = projects);
+  }
+
+  private deduplicateExpenses(expenses: ProjectExpense[]): ProjectExpense[] {
+    return Array.from(
+      new Map((expenses ?? []).map(expense => [expense.expense?.id, expense])).values()
+    );
   }
 }

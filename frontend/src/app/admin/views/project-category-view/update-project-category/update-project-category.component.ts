@@ -55,8 +55,7 @@ export class UpdateProjectCategoryComponent {
 
   submit() {
     this.submitted = true;
-    if(this.createForm.invalid)
-      return;
+    if (this.createForm.invalid) { this.createForm.markAllAsTouched(); return; }
 
     this.loading = true;
     this.projectTypeService.update(this.projectType.id, this.name.value, this.code.value, this.isCourse)

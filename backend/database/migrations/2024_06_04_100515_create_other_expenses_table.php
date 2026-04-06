@@ -11,6 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('other_expenses')) {
+            Schema::table('other_expenses', function (Blueprint $table) {
+                if (!Schema::hasColumn('other_expenses', 'project_id')) {
+                    $table->unsignedBigInteger('project_id')->nullable();
+                    $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
+                }
+            });
+
+            return;
+        }
+
         Schema::create('other_expenses', function (Blueprint $table) {
             $table->id();
             $table->timestamps();

@@ -1,18 +1,20 @@
 <div *ngIf="(projectTypeService.models$|async)
               && (expenseService.models$|async)
               && (lecturerService.models$|async); else loadingSpinner"
-     style="max-width: 1000px">
+     class="project-form-page">
 
   <div class="form-title">
-    <img *ngIf="project?.company?.image_url" [src]="project.company.image_url" alt="Company Image" style="max-height: 100px; max-width: 100%">
+    <div *ngIf="project?.company?.image_url" class="company-logo-preview">
+      <img [src]="project.company.image_url" alt="Company Image">
+    </div>
   </div>
   <h1>{{ title }}</h1>
   <p *ngIf="project">Erstelldatum: {{ project.createdAt | date : 'dd.MM.YYYY H:m' }}</p>
-  <form [formGroup]="projectForm">
+  <form [formGroup]="projectForm" [class.validation-submitted]="submitted">
 
-    <div class="p-fluid">
+    <div class="p-fluid project-overview-grid">
 
-      <div class="flex flex-wrap gap-4 mb-4">
+      <div class="project-card project-main-fields">
         <div>
           <label for="projectType" class="mb-1">
             Projektart
@@ -35,8 +37,9 @@
                       [options]="companyService.models$|async" optionLabel="name" placeholder="Auswählen">
             <ng-template let-company pTemplate="item">
               <div class="flex align-items-center gap-2">
-                <img *ngIf="company.image_url" [src]="company.image_url" alt="Company Image"
-                     style="width: 40px; height: 40px; object-fit: cover; margin-right: 8px;">
+                <span *ngIf="company.image_url" class="company-logo-option">
+                  <img [src]="company.image_url" alt="Company Image">
+                </span>
                 <div>{{ company.name }}</div>
               </div>
             </ng-template>
@@ -52,7 +55,7 @@
         </div>
       </div>
 
-      <div class="flex flex-wrap gap-4 mb-4">
+      <div class="project-card project-date-fields">
         <div>
           <label for="start" class="mb-1">Startdatum</label>
           <p-calendar formControlName="start"
@@ -60,6 +63,9 @@
                       [showIcon]="true"
                       firstDayOfWeek="1"
                       dateFormat="dd.mm.yy"></p-calendar>
+          <small *ngIf="start?.errors?.required && submitted" class="p-error">
+            Ein Startdatum ist erforderlich.
+          </small>
         </div>
 
         <div>
@@ -69,10 +75,13 @@
                       [showIcon]="true"
                       firstDayOfWeek="1"
                       dateFormat="dd.mm.yy"></p-calendar>
+          <small *ngIf="end?.errors?.required && submitted" class="p-error">
+            Ein Enddatum ist erforderlich.
+          </small>
         </div>
       </div>
 
-      <div class="flex flex-wrap gap-4 mb-2" *ngIf="projectType.value.isCourse">
+      <div class="project-card project-course-fields" *ngIf="projectType.value.isCourse">
         <div class="flex flex-column">
           <label for="participants" class="mb-1">Teilnehmeranzahl</label>
           <input id="participants" type="number" pInputText formControlName="participants"
@@ -83,7 +92,7 @@
         </div>
 
         <div class="flex flex-column">
-          <label for="duration" class="mb-1">Dauer des Projekts (in Tagen)</label>
+          <label for="duration" class="mb-1">Projektdauer (Tage)</label>
           <input id="duration" type="number" pInputText formControlName="duration" placeholder="Tage">
           <small *ngIf="duration?.errors?.required && submitted" class="p-error">
             Die Dauer des Projekts ist erforderlich.
@@ -100,7 +109,7 @@
 
         <div class="mb-4 flex">
           <div class="flex flex-column"
-               *ngIf="(authService.user$|async)?.role == ERole.ADMIN && projectType.value.isCourse">
+               *ngIf="isAdmin && projectType.value.isCourse">
             <label class="mb-1"
                    [for]="!project ? 'new-project-daily-rate-override-' + i : 'new-project-' + project.id + '-' + 'daily-rate-override-' + i">
               Preis pro Tag <small *ngIf="priceForCoursePerDayOverride.value != project.faculty.priceForCoursePerDay">(standardmäßig {{ project.faculty.priceForCoursePerDay }}
@@ -116,165 +125,127 @@
       </div>
 
 
-      <div class="mb-4">
+      <div class="project-card project-notes">
         <label for="notes" class="mb-1">Anmerkungen</label>
         <textarea rows="5" cols="30" id="notes" pInputTextarea formControlName="notes"></textarea>
       </div>
 
+      <div class="project-card project-contact">
+        <p class="m-0 font-bold">Ansprechperson</p>
 
-      <p class="m-0 my-1 font-bold">Ansprechperson</p>
+        <div class="project-contact-grid">
+          <div>
+            <label for="email" class="mb-1">E-Mail</label>
+            <input id="email" type="text" pInputText formControlName="email" placeholder="E-Mail">
+            <small *ngIf="email?.errors?.required && submitted" class="p-error">
+              Eine E-Mail ist erforderlich.
+            </small>
+            <small *ngIf="email?.errors?.email && submitted" class="p-error">
+              Bitte gib eine gültige E-Mail-Adresse ein.
+            </small>
+          </div>
 
-      <div class="flex flex-wrap gap-4 mb-4">
-        <div>
-          <label for="email" class="mb-1">E-Mail</label>
-          <input id="email" type="text" pInputText formControlName="email" placeholder="E-Mail">
-          <small *ngIf="email?.errors?.required && submitted" class="p-error">
-            Eine E-Mail ist erforderlich.
-          </small>
-        </div>
+          <div>
+            <label for="firstname" class="mb-1">Vorname</label>
+            <input id="firstname" type="text" pInputText formControlName="firstname" placeholder="Vorname">
+            <small *ngIf="firstname?.errors?.required && submitted" class="p-error">
+              Ein Vorname ist erforderlich.
+            </small>
+          </div>
 
-        <div>
-          <label for="firstname" class="mb-1">Vorname</label>
-          <input id="firstname" type="text" pInputText formControlName="firstname" placeholder="Vorname">
-          <small *ngIf="firstname?.errors?.required && submitted" class="p-error">
-            Ein Vorname ist erforderlich.
-          </small>
-        </div>
-
-        <div>
-          <label for="lastname" class="mb-1">Nachname</label>
-          <input id="lastname" type="text" pInputText formControlName="lastname" placeholder="Nachname">
-          <small *ngIf="lastname?.errors?.required && submitted" class="p-error">
-            Ein Nachname ist erforderlich.
-          </small>
+          <div>
+            <label for="lastname" class="mb-1">Nachname</label>
+            <input id="lastname" type="text" pInputText formControlName="lastname" placeholder="Nachname">
+            <small *ngIf="lastname?.errors?.required && submitted" class="p-error">
+              Ein Nachname ist erforderlich.
+            </small>
+          </div>
         </div>
       </div>
 
     </div>
 
-    <div class="mb-4 px-2 pb-2 border-1 border-300 border-round">
-      <p class="m-0 my-1 font-bold">Aufwände</p>
-      <app-project-expenses [project]="project" [projectForm]="projectForm"
-                            [submitted]="submitted"></app-project-expenses>
-    </div>
-
-    <div class="mb-4 px-2 pb-2 border-1 border-300 border-round">
-      <p class="m-0 my-1 font-bold">Vortragende</p>
-
-      <div class="mb-3 flex flex-wrap gap-4">
-        <div>
-          <p-checkbox [binary]="true" formControlName="crossFaculty" inputId="crossFaculty" class="mr-2"></p-checkbox>
-          <label for="crossFaculty">Fakultätsübergreifend</label>
-        </div>
-
-        <div *ngIf="crossFaculty.value" class="flex flex-column align-items-start gap-1">
-          <label for="crossFaculties">
-            Fakultäten
-          </label>
-
-          <p-multiSelect #crossFacultySelect
-                         id="crossFaculties"
-                         formControlName="crossFaculties"
-                         [options]="dropDownFaculties"
-                         optionLabel="name"
-                         [filter]="false"
-                         [style]="{'width':'200px'}"
-                         placeholder="Auswählen">
-          </p-multiSelect>
-
-        </div>
+    <div class="project-work-grid">
+      <div class="project-card">
+        <p class="m-0 font-bold">Aufwände</p>
+        <app-project-expenses [project]="project" [projectForm]="projectForm"
+                              [submitted]="submitted"></app-project-expenses>
       </div>
 
-      <app-project-lecturers [project]="project"
-                             [projectForm]="projectForm"
-                             [dropDownLecturers]="dropDownLecturers"
-                             [submitted]="submitted"></app-project-lecturers>
+      <div class="project-card">
+        <p class="m-0 font-bold">Vortragende</p>
+
+        <div class="mb-3 flex flex-wrap gap-4">
+          <div>
+            <p-checkbox [binary]="true" formControlName="crossFaculty" inputId="crossFaculty" class="mr-2"></p-checkbox>
+            <label for="crossFaculty">Fakultätsübergreifend</label>
+          </div>
+
+          <div *ngIf="crossFaculty.value" class="flex flex-column align-items-start gap-1">
+            <label for="crossFaculties">
+              Fakultäten
+            </label>
+
+            <p-multiSelect #crossFacultySelect
+                           id="crossFaculties"
+                           formControlName="crossFaculties"
+                           [options]="dropDownFaculties"
+                           optionLabel="name"
+                           [filter]="false"
+                           [style]="{'width':'200px'}"
+                           placeholder="Auswählen">
+            </p-multiSelect>
+
+          </div>
+        </div>
+
+        <app-project-lecturers [project]="project"
+                               [projectForm]="projectForm"
+                               [dropDownLecturers]="dropDownLecturers"
+                               [submitted]="submitted"></app-project-lecturers>
+      </div>
     </div>
 
   </form>
 
-  <div *ngIf="(authService.user$|async)?.role == ERole.ADMIN">
+  <div *ngIf="isAdmin">
 
-    <hr class="my-4">
-
-    <div class="flex align-items-center gap-2 text-lg	 font-light font-italic mb-4">
+    <div class="admin-note">
       <i class="pi pi-info-circle"></i>
       <span>Dieser Bereich ist nur als Admin sichtbar</span>
     </div>
 
-    <div class="mb-4 px-2 pb-2 border-1 border-300 border-round">
-      <p class="m-0 mt-1 mb-4 font-bold">Zusätzliche Aufwände</p>
-      <app-project-other-expenses [project]="project" [projectForm]="projectForm"
-                                  [submitted]="submitted" [isCourse]="isCourse"></app-project-other-expenses>
-    </div>
+    <div class="admin-cost-grid">
+      <div class="project-card">
+        <p class="m-0 font-bold">Zusätzliche Aufwände</p>
+        <app-project-other-expenses [project]="project" [projectForm]="projectForm"
+                                    [submitted]="submitted" [isCourse]="isCourse"></app-project-other-expenses>
+      </div>
 
-    <div class="mb-4 px-2 pb-2 border-1 border-300 border-round">
-      <p class="m-0 mt-1 mb-4 font-bold">Projektgruppenspezifische Aufwände</p>
-      <app-project-group-specific-expenses [project]="project" [projectForm]="projectForm"
-                                  [submitted]="submitted" [isCourse]="isCourse"></app-project-group-specific-expenses>
-    </div>
-
-    <div *ngIf="!showDetailedCalculations || (showDetailedCalculations && !projectType.value.isCourse)"
-         class="flex justify-content-end">
-      <div class="font-light text-right flex gap-5">
-        <div *ngIf="projectType.value.isCourse && revenue">
-          <div>Einnahmen</div>
-          <div class="text-sm">
-            <div>Preis pro Tag<span class="mx-1">x</span>Tage<span class="mx-1">x</span> Teilnehmer</div>
-            <div>{{ priceForCoursePerDayOverride.value | currency: "EUR" }}<span
-              class="mx-1">x</span>{{ duration.value }}<span class="mx-1">x</span>{{ participants.value }}
-            </div>
-          </div>
-          <strong>{{ revenue | currency: "EUR" }}</strong>
-        </div>
-
-        <div>
-          <div>Kosten</div>
-          <div class="text-sm">
-            <div>Aufwände<span class="ml-3">{{ Utils.getExpenseCosts(projectExpenses.value) | currency: "EUR" }}</span>
-            </div>
-            <div>Vortragende<span
-              class="ml-3">{{ Utils.getLecturersCosts(projectLecturers.value) | currency: "EUR" }}</span></div>
-            <div>Zusätzliche Aufwände<span
-              class="ml-3">{{ Utils.getOtherExpenseCosts(otherExpenses.value, participants.value) | currency: "EUR" }}</span>
-            </div>
-            <div>Projektgruppenspezifische Aufwände<span
-              class="ml-3">{{ Utils.getGroupSpecificExpenseCosts(groupSpecificExpenses.value, participants.value) | currency: "EUR" }}</span>
-            </div>
-          </div>
-        </div>
+      <div class="project-card">
+        <p class="m-0 font-bold">Projektgruppenspezifische Aufwände</p>
+        <app-project-group-specific-expenses [project]="project" [projectForm]="projectForm"
+                                    [submitted]="submitted" [isCourse]="isCourse"></app-project-group-specific-expenses>
       </div>
     </div>
 
-    <div *ngIf="showDetailedCalculations && projectType.value.isCourse" class="flex justify-content-end">
-      <app-calculations [projectExpenses]="projectExpenses.value"
-                        [projectLecturers]="projectLecturers.value"
-                        [otherExpenses]="otherExpenses.value"
-                        [groupSpecificExpenses]="groupSpecificExpenses.value"
-                        [participants]="participants.value"
-                        [duration]="duration.value"
-                        [priceForCoursePerDay]="priceForCoursePerDayOverride.value"></app-calculations>
-    </div>
-
-    <div *ngIf="projectType.value.isCourse" class="flex justify-content-end mt-2">
-      <p-button size="small" [outlined]="true"
-                label="{{showDetailedCalculations ? 'Detaillierte Kalkulationen verbergen' : 'Detaillierte Kalkulationen anzeigen' }}"
-                (click)="showDetailedCalculations = !showDetailedCalculations"/>
-    </div>
 
   </div>
 
-  <hr class="mb-2">
-
-  <div class="flex justify-content-between mb-2">
+  <div class="project-result-bar">
     <div>
-      <div *ngIf="isCourse && revenue && totalCost"
-           class="flex align-items-center gap-2 text-3xl {{revenue > totalCost ? 'text-primary' : (revenue == totalCost ? 'text-orange-500' : 'text-red-500')}}">
-        <i *ngIf="revenue > totalCost" style="font-size: 2rem" class="pi pi-check-circle"></i>
-        <i *ngIf="revenue == totalCost" style="font-size: 2rem" class="pi pi-info-circle"></i>
-        <i *ngIf="revenue < totalCost" style="font-size: 2rem" class="pi pi-exclamation-triangle"></i>
-
-        <span>{{ revenue > totalCost ? 'Gewinnbringend' : (revenue == totalCost ? 'Kostendeckend' : 'Nicht kostendeckend!') }}</span>
+      <div *ngIf="isCourse && revenue !== null && totalCost !== null"
+           class="flex flex-column gap-2">
+        <div class="flex align-items-center gap-2 text-3xl" [class.text-primary]="projectHasProfit" [class.text-red-500]="!projectHasProfit">
+          <i style="font-size: 2rem" [class]="projectHasProfit ? 'pi pi-check-circle' : 'pi pi-exclamation-triangle'"></i>
+          <span>{{ projectHasProfit ? 'Aktuell macht das Projekt Gewinn.' : 'Aktuell macht das Projekt Verlust.' }}</span>
+        </div>
+        <div *ngIf="breakEvenParticipants !== null">
+          Break-even ab <strong>{{ breakEvenParticipants }}</strong> Teilnehmer{{ breakEvenParticipants === 1 ? '' : 'n' }}.
+        </div>
+        <div *ngIf="breakEvenParticipants === null" class="text-red-500">
+          Kein Break-even möglich, weil die variablen Kosten pro Teilnehmer zu hoch sind.
+        </div>
       </div>
     </div>
 
@@ -282,11 +253,29 @@
     <div class="flex flex-column align-items-end text-lg">
 
       <h4 class="m-0">Gesamtkosten</h4>
-      <p class="m-0">{{ totalCost ? (totalCost|currency:"EUR") : '-' }}</p>
+      <p class="m-0">{{ totalCost !== null ? (totalCost|currency:"EUR") : '-' }}</p>
       <p *ngIf="project && project.costs != totalCost" class="font-light m-0">(vorherige
         Kosten: {{ project.costs|currency:"EUR" }})</p>
 
     </div>
+  </div>
+
+  <div *ngIf="canShowDetailedCalculations && showDetailedCalculations" class="flex justify-content-end mt-4">
+    <app-calculations [projectExpenses]="projectExpenses.value"
+                      [projectLecturers]="projectLecturers.value"
+                      [otherExpenses]="calculationOtherExpenses"
+                      [groupSpecificExpenses]="calculationGroupSpecificExpenses"
+                      [participants]="participants.value"
+                      [duration]="duration.value"
+                      [priceForCoursePerDay]="priceForCoursePerDayOverride.value"
+                      [showRevenue]="isCourse"
+                      [showAdminCosts]="isAdmin"></app-calculations>
+  </div>
+
+  <div *ngIf="canShowDetailedCalculations" class="flex justify-content-end mt-2">
+    <p-button size="small" [outlined]="true"
+              label="{{showDetailedCalculations ? 'Detaillierte Kalkulation verbergen' : 'Detaillierte Kalkulation anzeigen' }}"
+              (click)="showDetailedCalculations = !showDetailedCalculations"/>
   </div>
 
   <div class="flex justify-content-end mt-4 gap-4">
@@ -305,7 +294,7 @@
           class="{{getProjectStateIconClass(project.state)}}"></i> {{ getProjectStateLabel(project.state) }}</strong>
         <small *ngIf="project.stateChangedAt">(zuletzt geändert {{ project.stateChangedAt | date : 'dd.MM.YYYY H:m' }})</small>
       </div>
-      <div class="flex gap-4" *ngIf="(authService.user$|async)?.role == ERole.ADMIN">
+      <div class="flex gap-4" *ngIf="isAdmin">
         <p-button *ngIf="project.state != EProjectState.APPROVED"
                   pRipple
                   [label]="'Genehmigen'"

@@ -16,7 +16,7 @@ export class UserService extends AResourceService<User>{
   }
 
   override getAll() {
-    this._loading.next(true);
+    if (!this.models?.length) this._loading.next(true);
     this.http.get<User[]>(environment.adminApiUrl + 'users')
       .pipe(finalizeLoading(this._loading, false))
       .subscribe({

@@ -2,8 +2,9 @@
             [options]="companyService.models$ | async" optionLabel="name" placeholder="Auswählen">
   <ng-template let-company pTemplate="item">
     <div class="flex align-items-center gap-2">
-      <img *ngIf="company.image_url" [src]="company.image_url" alt="Company Image"
-                               style="width: 40px; height: 40px; object-fit: cover; margin-right: 8px;">
+      <span *ngIf="company.image_url" class="company-logo-option">
+        <img [src]="company.image_url" alt="Company Image">
+      </span>
       <div>{{ company.name }}</div>
     </div>
   </ng-template>

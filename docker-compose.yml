@@ -1,9 +1,26 @@
 version: "3.0"
 services:
+    frontend:
+        build:
+            context: ./frontend
+            dockerfile: ../docker/frontend/Dockerfile
+        volumes:
+            - ./frontend:/frontend
+            - /frontend/node_modules
+        ports:
+            - "127.0.0.1:4200:4200"
+        depends_on:
+            - backend
+
     backend:
         build: ./docker/backend
         volumes:
             - ./backend:/backend
+            - /backend/vendor
+            - /backend/bootstrap/cache
+            - /backend/storage/framework/cache
+            - /backend/storage/framework/sessions
+            - /backend/storage/framework/views
         ports:
             - "127.0.0.1:8080:80"
         depends_on:

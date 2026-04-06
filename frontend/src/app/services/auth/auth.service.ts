@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import {BehaviorSubject, filter, Observable, take, tap} from "rxjs";
 import {HttpClient} from "@angular/common/http";
+import {HttpHeaders} from "@angular/common/http";
 import {Router} from "@angular/router";
 import {environment} from "../../../environments/environment";
 import {User} from "../../models/user.model";
-import {finalizeLoading} from "../../shared/operators/finalize-loading.operator";
 
 @Injectable({
   providedIn: 'root'
@@ -69,18 +69,22 @@ export class AuthService {
   }
 
   public logout() {
-    return this.http.post<any>(environment.apiUrl + 'logout', {})
-      .pipe(
-        take(1),
-        finalizeLoading(this._logoutLoading, false),
-        tap(() => {
-          // log user out in browser
-          localStorage.clear()
-          sessionStorage.clear()
-          this._user.next(null);
-          this.router.navigate(['auth']);
-        }))
-      .subscribe();
+    const token = this.token;
+
+    localStorage.clear()
+    sessionStorage.clear()
+    this._user.next(null);
+    this._logoutLoading.next(false);
+    this.router.navigate(['auth']);
+
+    if (!token)
+      return;
+
+    this.http.post<any>(environment.apiUrl + 'logout', {}, {
+      headers: new HttpHeaders().append("Authorization", "Bearer " + token)
+    })
+      .pipe(take(1))
+      .subscribe({error: () => {}});
   }
 
   public changePassword(password: string, password_confirmation: string): Observable<User>

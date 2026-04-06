@@ -29,7 +29,7 @@ export class LecturerService extends AResourceService<Lecturer> {
   }
 
   override getAll(): void {
-    this._loading.next(true);
+    if (!this.models?.length) this._loading.next(true);
     this.http.get<Lecturer[]>(environment.apiUrl + `lecturers`)
       .pipe(finalizeLoading(this._loading, false))
       .subscribe({

@@ -89,8 +89,10 @@ export class EditProjectComponent implements OnInit {
 
   update() {
     this.submitted = true;
-    if(this.editProjectForm.invalid)
+    if(this.editProjectForm.invalid) {
+      this.editProjectForm.markAllAsTouched();
       return;
+    }
 
     this.updateLoading = true;
 
@@ -115,8 +117,8 @@ export class EditProjectComponent implements OnInit {
       this.ects.value,
       this.crossFaculties.value,
       this.priceForCoursePerDayOverride.value,
-      this.otherExpenses.value,
-      this.groupSpecificExpenses.value
+      this.authService.user.role == ERole.ADMIN ? this.otherExpenses.value : this.project.otherExpenses,
+      this.authService.user.role == ERole.ADMIN ? this.groupSpecificExpenses.value : this.project.groupSpecificExpenses
     )
       .pipe(
         finalize(() => this.updateLoading = false)

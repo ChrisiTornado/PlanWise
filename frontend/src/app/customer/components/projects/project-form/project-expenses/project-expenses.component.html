@@ -14,14 +14,17 @@
 
           <p-dropdown [id]="!project ? 'new-project-expense-' + i : 'project-' + project.id + '-' + 'expense-' + i"
                       formControlName="expense"
-                      [options]="expenseService.models$|async"
+                      [options]="availableExpenses(i)"
                       optionLabel="name"
                       [style]="{'width':'200px'}"
                       placeholder="Auswählen"></p-dropdown>
 
         </div>
 
-        <span class="p-float-label">
+        <div class="flex flex-column align-items-start gap-1">
+          <label [for]="!project ? 'new-project-expense-costs-' + i : 'new-project-' + project.id + '-' + 'expense-costs-' + i">
+            Kosten
+          </label>
           <p-inputNumber [inputId]="!project ? 'new-project-expense-costs-' + i : 'new-project-' + project.id + '-' + 'expense-costs-' + i"
                            formControlName="costs"
                            class="flex-grow-1"
@@ -29,13 +32,10 @@
                            currency="EUR"
                            locale="de-DE"
                            placeholder="€"></p-inputNumber>
-          <label [for]="!project ? 'new-project-expense-costs-' + i : 'new-project-' + project.id + '-' + 'expense-costs-' + i">
-            Kosten
-          </label>
           <small *ngIf="costs(i)?.errors?.required && submitted" class="p-error">
             Kosten sind erforderlich.
           </small>
-        </span>
+        </div>
 
         <button pButton pRipple type="button" icon="pi pi-trash"
                 class="p-button-rounded p-button-danger p-button-outlined" (click)="removeProjectExpense(i)"></button>

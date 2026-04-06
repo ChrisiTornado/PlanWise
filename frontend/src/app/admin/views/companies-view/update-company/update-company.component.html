@@ -4,18 +4,20 @@
 
     <p-dialog header="Kunde aktualisieren" [(visible)]="visible" [modal]="true" [style]="{ width: '50vw' }"
               [draggable]="false" [resizable]="false" (onHide)="closeDialog()">
-      <form [formGroup]="createForm">
+      <form [formGroup]="createForm" [class.validation-submitted]="submitted">
         <div class="mb-4">
             <label for="name" class="block text-900 font-medium mb-2">Kunde</label>
             <input id="name" formControlName="name" type="text" placeholder="Name" pInputText pAutoFocus [autofocus]="true" class="w-full">
 
             <div style="position: relative">
-              <small style="position: absolute; color: red" *ngIf="name.hasError('required') && (name.touched || submitted)">Name ist erforderlich</small>
+              <small class="p-error" style="position: absolute" *ngIf="name.hasError('required') && submitted">Name ist erforderlich</small>
             </div>
           </div>
         <div class="mb-4">
             <label class="block text-900 font-medium mb-2">Aktuelles Kundenbild</label>
-            <img *ngIf="this.company.image_url" [src]="this.company.image_url" alt="Default Image" class="w-full" width="120" height="120"/>
+            <div *ngIf="this.company.image_url" class="company-logo-preview">
+              <img [src]="this.company.image_url" alt="Default Image">
+            </div>
         </div>
 
         <div class="mb-4">
@@ -31,7 +33,7 @@
             </p-fileUpload>
 
             <div style="position: relative">
-              <small style="position: absolute; color: red" *ngIf="image.hasError('required') && (image.touched || submitted)">Kundenbild ist erforderlich</small>
+              <small class="p-error" style="position: absolute" *ngIf="image.hasError('required') && submitted">Kundenbild ist erforderlich</small>
             </div>
           </div>
 

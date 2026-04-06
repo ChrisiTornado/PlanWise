@@ -1,6 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {LecturerService} from "../../../services/lecturer.service";
-import {MegaMenuItem} from "primeng/api";
+import {ConfirmationService, MegaMenuItem} from "primeng/api";
+import {NavigationEnd, Router} from "@angular/router";
+import {filter} from "rxjs";
 import {AuthService} from "../../../services/auth/auth.service";
 import {ExpenseService} from "../../../services/expense.service";
 import {ProjectTypeService} from "../../../services/project-type.service";
@@ -30,7 +32,9 @@ export class DashboardComponent implements OnInit {
               private projectTypeService: ProjectTypeService,
               private projectService: ProjectService,
               private companyService: CompanyService,
-              public authService: AuthService) {
+              public authService: AuthService,
+              private confirmationService: ConfirmationService,
+              private router: Router) {
   }
 
   ngOnInit() {
@@ -56,6 +60,11 @@ export class DashboardComponent implements OnInit {
       }
     ]
 
+    this.setActiveNavigationItem(this.router.url);
+    this.router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe(event => this.setActiveNavigationItem(event.urlAfterRedirects));
+
     this.authService.logoutLoading$.subscribe(
       {
         next: (loading) => {
@@ -73,10 +82,29 @@ export class DashboardComponent implements OnInit {
   }
 
   logout() {
-    this.authService.logoutLoading = true
-    this.services.forEach((service: any) => {
-      service.reset()
-    })
-    this.authService.logout();
+    this.confirmationService.confirm({
+      header: 'Logout bestätigen',
+      message: 'Möchtest du dich wirklich ausloggen?',
+      icon: 'pi pi-sign-out',
+      accept: () => {
+        this.authService.logoutLoading = true
+        this.services.forEach((service: any) => {
+          service.reset()
+        })
+        this.authService.logout();
+      }
+    });
+  }
+
+  private setActiveNavigationItem(url: string) {
+    this.items = this.items?.map(item => ({
+      ...item,
+      styleClass: this.isNavigationItemActive(item, url) ? 'navigation-item-active' : undefined
+    }));
+  }
+
+  private isNavigationItemActive(item: MegaMenuItem, url: string): boolean {
+    const link = Array.isArray(item.routerLink) ? item.routerLink.join('/') : item.routerLink;
+    return link === 'projects' && url.startsWith('/customer/projects');
   }
 }

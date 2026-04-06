@@ -21,8 +21,10 @@
         <p-dropdown #lecturersDropdown
                     [id]="!project ? 'new-project-lecturer-' + i : 'project-' + project.id + '-' + 'lecturer-' + i"
                     formControlName="lecturer"
-                    [options]="dropDownLecturers"
+                    [options]="availableLecturers"
                     [optionLabel]="'name'"
+                    optionGroupLabel="label"
+                    optionGroupChildren="items"
                     [emptyMessage]="'Kein/e Vortragende/r mehr verfügbar'"
                     [group]="crossFaculty"
                     [style]="{'width':'200px'}">
@@ -36,38 +38,38 @@
 
       </div>
 
-      <span class="p-float-label">
+      <div class="flex flex-column align-items-start gap-1">
+          <label [for]="!project ? 'new-project-hours-' + i : 'new-project-' + project.id + '-' + 'hours-' + i">
+            {{ daily.value ? 'Tage' : 'Stunden' }}
+          </label>
           <p-inputNumber [inputId]="!project ? 'new-project-hours-' + i : 'new-project-' + project.id + '-' + 'hours-' + i"
                          formControlName="hours"
                          class="flex-grow-1"
                          placeholder="{{daily.value ? 'Tage' : 'h'}}" suffix="{{daily.value ? 'd' : 'h'}}"></p-inputNumber>
-          <label [for]="!project ? 'new-project-hours-' + i : 'new-project-' + project.id + '-' + 'hours-' + i">
-            {{ daily.value ? 'Tage' : 'Stunden' }}
-          </label>
           <small *ngIf="hours?.errors?.required && submitted" class="p-error">
             Stunden sind erforderlich.
           </small>
-      </span>
+      </div>
 
-      <span class="p-float-label" *ngIf="(authService.user$|async)?.role == ERole.ADMIN && !daily.value">
+      <div class="flex flex-column align-items-start gap-1" *ngIf="(authService.user$|async)?.role == ERole.ADMIN && !daily.value">
+          <label [for]="!project ? 'new-project-hourly-rate-override-' + i : 'new-project-' + project.id + '-' + 'hourly-rate-override-' + i">
+            Stundensatz <span *ngIf="selectedLecturer && selectedLecturer.hourlyRate != hourlyRateOverride.value">(standardmäßig {{ selectedLecturer.hourlyRate }}€)</span>
+          </label>
           <p-inputNumber [inputId]="!project ? 'new-project-hourly-rate-override-' + i : 'new-project-' + project.id + '-' + 'hourly-rate-override-' + i"
                          formControlName="hourlyRateOverride"
                          class="flex-grow-1"
                          suffix="€"></p-inputNumber>
-          <label [for]="!project ? 'new-project-hourly-rate-override-' + i : 'new-project-' + project.id + '-' + 'hourly-rate-override-' + i">
-            Stundensatz <span *ngIf="lecturer.value.hourlyRate != hourlyRateOverride.value">(standardmäßig {{ lecturer.value.hourlyRate }}€)</span>
-          </label>
-      </span>
+      </div>
 
-      <span class="p-float-label" *ngIf="(authService.user$|async)?.role == ERole.ADMIN && daily.value">
+      <div class="flex flex-column align-items-start gap-1" *ngIf="(authService.user$|async)?.role == ERole.ADMIN && daily.value">
+          <label [for]="!project ? 'new-project-daily-rate-override-' + i : 'new-project-' + project.id + '-' + 'daily-rate-override-' + i">
+            Tagessatz <span *ngIf="selectedLecturer && selectedLecturer.dailyRate != dailyRateOverride.value">(standardmäßig {{ selectedLecturer.dailyRate }}€)</span>
+          </label>
           <p-inputNumber [inputId]="!project ? 'new-project-daily-rate-override-' + i : 'new-project-' + project.id + '-' + 'daily-rate-override-' + i"
                          formControlName="dailyRateOverride"
                          class="flex-grow-1"
                          suffix="€"></p-inputNumber>
-          <label [for]="!project ? 'new-project-daily-rate-override-' + i : 'new-project-' + project.id + '-' + 'daily-rate-override-' + i">
-            Tagessatz <span *ngIf="lecturer.value.dailyRate != dailyRateOverride.value">(standardmäßig {{ lecturer.value.dailyRate }}€)</span>
-          </label>
-      </span>
+      </div>
 
       <button pButton pRipple type="button" icon="pi pi-trash"
               class="p-button-rounded p-button-danger p-button-outlined" (click)="removeProjectLecturer()"></button>

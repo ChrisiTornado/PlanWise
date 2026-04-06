@@ -7,3 +7,107 @@
     margin-left: 2vh;
     padding-top: 0.7vh;
 }
+
+.project-form-page {
+  max-width: 1280px;
+  width: 100%;
+}
+
+.project-overview-grid,
+.project-work-grid,
+.admin-cost-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.project-overview-grid {
+  grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.9fr);
+  margin-bottom: 1rem;
+}
+
+.project-main-fields,
+.project-course-fields,
+.project-contact-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.project-date-fields {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.project-notes,
+.project-contact {
+  grid-column: 1 / -1;
+}
+
+.project-notes textarea {
+  min-height: 84px;
+}
+
+.project-work-grid,
+.admin-cost-grid {
+  align-items: start;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 1rem;
+}
+
+.project-card {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.project-card > p:first-child {
+  margin-bottom: 0.75rem !important;
+}
+
+.admin-note {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.25rem 0 1rem;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.project-result-bar {
+  align-items: center;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+:host ::ng-deep {
+  .project-card .p-dropdown,
+  .project-card .p-calendar,
+  .project-card .p-inputnumber {
+    width: 100%;
+  }
+
+  .project-card .p-calendar .p-inputtext,
+  .project-card .p-inputnumber .p-inputtext {
+    width: 100%;
+  }
+}
+
+@media (max-width: 900px) {
+  .project-overview-grid,
+  .project-work-grid,
+  .admin-cost-grid,
+  .project-date-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .project-result-bar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
