@@ -1,0 +1,130 @@
+<svg width="1200" height="420" viewBox="0 0 1200 420" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">PlanWise animated project banner</title>
+  <desc id="desc">An animated banner for PlanWise, a project planning and break-even calculation platform.</desc>
+  <style>
+    :root {
+      --bg: #07140f;
+      --panel: #0d241a;
+      --panel-2: #123322;
+      --green: #2ed47a;
+      --green-soft: #7ce7ad;
+      --blue: #37a2ff;
+      --text: #f4fff8;
+      --muted: #a9c7b5;
+    }
+
+    .grid {
+      stroke: rgba(124, 231, 173, 0.16);
+      stroke-width: 1;
+      animation: drift 12s linear infinite;
+    }
+
+    .pulse {
+      animation: pulse 2.6s ease-in-out infinite;
+      transform-origin: center;
+    }
+
+    .float-a {
+      animation: floatA 5s ease-in-out infinite;
+    }
+
+    .float-b {
+      animation: floatB 6s ease-in-out infinite;
+    }
+
+    .draw {
+      stroke-dasharray: 620;
+      stroke-dashoffset: 620;
+      animation: draw 3.8s ease forwards infinite;
+    }
+
+    .bar-a { animation: growA 4.5s ease-in-out infinite; transform-origin: 710px 326px; }
+    .bar-b { animation: growB 4.5s ease-in-out infinite; transform-origin: 778px 326px; }
+    .bar-c { animation: growC 4.5s ease-in-out infinite; transform-origin: 846px 326px; }
+    .bar-d { animation: growD 4.5s ease-in-out infinite; transform-origin: 914px 326px; }
+
+    @keyframes drift {
+      from { transform: translateY(0); }
+      to { transform: translateY(28px); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.75; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.08); }
+    }
+
+    @keyframes floatA {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    @keyframes floatB {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(10px); }
+    }
+
+    @keyframes draw {
+      0% { stroke-dashoffset: 620; opacity: 0.2; }
+      45%, 70% { stroke-dashoffset: 0; opacity: 1; }
+      100% { stroke-dashoffset: -620; opacity: 0.2; }
+    }
+
+    @keyframes growA {
+      0%, 100% { transform: scaleY(0.55); }
+      50% { transform: scaleY(0.85); }
+    }
+
+    @keyframes growB {
+      0%, 100% { transform: scaleY(0.8); }
+      50% { transform: scaleY(0.6); }
+    }
+
+    @keyframes growC {
+      0%, 100% { transform: scaleY(0.65); }
+      50% { transform: scaleY(1); }
+    }
+
+    @keyframes growD {
+      0%, 100% { transform: scaleY(0.95); }
+      50% { transform: scaleY(0.72); }
+    }
+  </style>
+
+  <rect width="1200" height="420" rx="28" fill="var(--bg)"/>
+  <path d="M0 78H1200M0 126H1200M0 174H1200M0 222H1200M0 270H1200M0 318H1200M0 366H1200M90 0V420M180 0V420M270 0V420M360 0V420M450 0V420M540 0V420M630 0V420M720 0V420M810 0V420M900 0V420M990 0V420M1080 0V420" class="grid"/>
+
+  <circle cx="1006" cy="88" r="92" fill="#103d2a" opacity="0.55" class="float-a"/>
+  <circle cx="1046" cy="302" r="126" fill="#0b3258" opacity="0.42" class="float-b"/>
+
+  <g transform="translate(86 82)">
+    <rect x="0" y="0" width="404" height="256" rx="22" fill="var(--panel)" stroke="#245139"/>
+    <circle cx="42" cy="44" r="12" fill="var(--green)" class="pulse"/>
+    <circle cx="78" cy="44" r="12" fill="var(--blue)" opacity="0.75"/>
+    <circle cx="114" cy="44" r="12" fill="#f0c15e" opacity="0.8"/>
+    <text x="42" y="104" fill="var(--text)" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="52" font-weight="800">PlanWise</text>
+    <text x="44" y="146" fill="var(--muted)" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22">Project planning, pricing and profit clarity.</text>
+    <rect x="42" y="184" width="144" height="42" rx="10" fill="var(--green)"/>
+    <text x="68" y="212" fill="#07140f" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" font-weight="800">FastAPI</text>
+    <rect x="202" y="184" width="132" height="42" rx="10" fill="var(--panel-2)" stroke="#2e6a48"/>
+    <text x="232" y="212" fill="var(--green-soft)" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" font-weight="700">Angular</text>
+  </g>
+
+  <g transform="translate(596 70)">
+    <rect x="0" y="0" width="494" height="280" rx="24" fill="var(--panel)" stroke="#245139"/>
+    <text x="34" y="54" fill="var(--text)" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="26" font-weight="800">Break-even signal</text>
+    <text x="34" y="86" fill="var(--muted)" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17">When does a project start to make sense?</text>
+
+    <path d="M42 210C95 176 131 188 176 144C225 96 268 110 318 92C360 77 398 58 452 42" stroke="var(--green)" stroke-width="8" stroke-linecap="round" class="draw"/>
+    <path d="M42 232H452" stroke="#284f3a" stroke-width="2"/>
+    <path d="M42 122H452" stroke="#284f3a" stroke-width="2" stroke-dasharray="8 8"/>
+    <text x="42" y="116" fill="var(--green-soft)" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14">profit line</text>
+
+    <rect x="104" y="156" width="34" height="76" rx="8" fill="#225c3b" class="bar-a"/>
+    <rect x="172" y="122" width="34" height="110" rx="8" fill="#27704a" class="bar-b"/>
+    <rect x="240" y="94" width="34" height="138" rx="8" fill="#2a8b59" class="bar-c"/>
+    <rect x="308" y="66" width="34" height="166" rx="8" fill="var(--green)" class="bar-d"/>
+
+    <circle cx="319" cy="92" r="11" fill="var(--blue)" class="pulse"/>
+    <text x="350" y="98" fill="var(--text)" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17" font-weight="700">break-even</text>
+  </g>
+</svg>
