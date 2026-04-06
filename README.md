@@ -13,6 +13,16 @@ PlanWise is a full-stack project calculation platform for planning, pricing and 
   <img alt="Docker" src="https://img.shields.io/badge/Docker-1769aa?style=for-the-badge&logo=docker&logoColor=white" />
 </p>
 
+---
+
+## 🎥 Video Demo
+
+
+https://github.com/user-attachments/assets/4f44bdec-a413-4e8c-8bb4-c1211a455c6e
+
+
+---
+
 ## Why PlanWise
 
 PlanWise brings the messy parts of project planning into one calm workspace:
@@ -84,45 +94,3 @@ life-science@technikum-wien.at
 electronic-engineering@technikum-wien.at
 123456
 ```
-
-## Useful Commands
-
-```bash
-docker compose ps
-docker compose logs -f backend
-docker compose exec backend python -m app.db.fresh_seed
-docker compose exec frontend npm run build
-```
-
-## Project Layout
-
-```text
-backend_fastapi/         FastAPI application
-frontend/                Angular application
-storage/app/public/      Public assets, including company images
-docker/fastapi_backend/  Backend Dockerfile
-docker/frontend/         Frontend Dockerfile
-docker-compose.yml       Full local runtime
-```
-
-## Backend Notes
-
-The backend is implemented with FastAPI and serves the same API surface expected by the Angular frontend. The previous backend implementation has been removed.
-
-Important compatibility points:
-
-- API responses use frontend-friendly camelCase fields.
-- Money is stored in cents internally and returned as Euro values where expected.
-- Faculty users do not receive admin-only additional cost lists.
-- Company images are served through `/storage/company_images/...`.
-
-## Status
-
-PlanWise currently runs end to end in Docker Compose with:
-
-- Angular frontend
-- FastAPI backend
-- MariaDB database
-- Mock data seeded on backend startup
-- CSV and PDF exports
-- Company image storage
