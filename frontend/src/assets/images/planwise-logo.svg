@@ -1,0 +1,8 @@
+<svg width="220" height="64" viewBox="0 0 220 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="2" y="2" width="60" height="60" rx="8" fill="#102A43"/>
+  <path d="M18 41.5L29.5 30L37 37.5L48 23" stroke="#8BB31D" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M18 22H33" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>
+  <path d="M18 32H25" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round"/>
+  <text x="76" y="38" fill="#102A43" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="27" font-weight="800">PlanWise</text>
+  <circle cx="206" cy="21" r="5" fill="#8BB31D"/>
+</svg>
